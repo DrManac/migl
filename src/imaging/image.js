@@ -30,7 +30,7 @@ class Image extends ImageInfo {
 	constructor(info, data) {
 		super(info);
 
-		this._data = data || info._data || new Uint8Array(this.width * this.height * this.bytesPerPixel);
+		this._data = data || new Uint8Array(this.width * this.height * this.bytesPerPixel);
 		var array = this._data;
 		
 		var w = this.width, h = this.height, wc = this.windowCenter, ww = this.windowWidth,

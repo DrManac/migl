@@ -1,0 +1,51 @@
+<html>
+<head>
+	<title>Image View</title>
+	<meta charset="utf-8"></meta>
+	<style>
+body {
+	color: #ffffff;
+	font-family:Monospace;
+	font-size:13px;
+	text-align:center;
+	font-weight: bold;
+
+	background-color: #AAAAAA;
+	margin: 0px;
+}
+
+#workarea
+{
+	position: absolute;
+	left:0px;
+	right:0px;
+	top:0px;
+	bottom: 0px;
+	display: flex;
+}
+	</style>
+</head>
+<body>
+<div id="workarea">
+</div>
+	<script src="../build/migl.js"></script>
+	<script>
+
+var workarea = new migl.ViewArea(document.getElementById('workarea'));
+var view = new migl.FrameView();
+workarea.SetLayout([{element: view, size: 1}]);
+
+var img = new migl.Image();
+
+view.SetImages([img]);
+
+render();
+function render()
+{
+	view.Render();
+	requestAnimationFrame(render);
+}
+
+	</script>
+</body>
+</html>

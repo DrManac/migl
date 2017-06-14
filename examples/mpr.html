@@ -1,0 +1,67 @@
+<html>
+<head>
+	<title>MPR View</title>
+	<meta charset="utf-8"></meta>
+	<style>
+body {
+	color: #ffffff;
+	font-family:Monospace;
+	font-size:13px;
+	text-align:center;
+	font-weight: bold;
+
+	background-color: #AAAAAA;
+	margin: 0px;
+}
+
+#workarea
+{
+	position: absolute;
+	left:0px;
+	right:0px;
+	top:0px;
+	bottom: 0px;
+	display: flex;
+}
+	</style>
+</head>
+<body>
+<div id="workarea">
+</div>
+	<script src="../build/migl.js"></script>
+	<script>
+
+var workarea = new migl.ViewArea(document.getElementById('workarea'));
+
+var view1 = new migl.SliceView();
+var view2 = new migl.SliceView();
+var view3 = new migl.SliceView();
+
+workarea.SetLayout([{element: view1}, {element: view2}, {element: view3}]);
+
+var xort = [1, 0, 0];
+var yort = [0, 1, 0];
+var zort = [0, 0, -1];
+
+view1.SetOrts(xort, yort, zort);
+view2.SetOrts(xort, zort, yort);
+view3.SetOrts(yort, zort, xort);
+
+var vol = new migl.Volume();
+
+view1.SetVolume(vol);
+view2.SetVolume(vol);
+view3.SetVolume(vol);
+
+render();
+function render()
+{
+	view1.Render();
+	view2.Render();
+	view3.Render();
+	requestAnimationFrame(render);
+}
+
+	</script>
+</body>
+</html>

@@ -18,7 +18,7 @@ class VolumeInfo extends ImageInfo {
 class Volume extends VolumeInfo {
 	constructor(info, data) {
 		super(info);
-		this._data = data || info._data || new Uint8Array(this.width * this.height * this.depth * this.bytesPerPixel);
+		this._data = data || new Uint8Array(this.width * this.height * this.depth * this.bytesPerPixel);
 		var array = this._data;
 		
 		var w = this.width, h = this.height, d = this.depth, wc = this.windowCenter, ww = this.windowWidth,
