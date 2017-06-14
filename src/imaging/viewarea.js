@@ -50,17 +50,21 @@ function generateGrid(root, layout, isRow)
    		for(var i = 0; i < layout.length; i++)
    		{
    			var container = document.createElement('div');
+   			//container.style.position = 'relative';
+   			container.style.overflow = 'hidden';
+   			container.style.display = 'flex';
+   			container.style.flex = '1 1 auto';
    			if(isRow)
-   				container.className = 'ccol';
+   				container.style['flex-direction'] = 'column';
    			else
-   			    container.className = 'crow';
+   				container.style['flex-direction'] = 'row';
    			root.appendChild(container);
    			generateGrid(container, layout[i], !isRow);
    		}
    		return;
    	}
    	root.style['flex-grow'] = layout.size || 1;
-	root.className += " cell";
+	//root.className += " cell";
 }
 
 
