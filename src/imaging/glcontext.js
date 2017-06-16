@@ -1,4 +1,5 @@
 import twgl from 'twgl-base.js'
+import { Shaders } from './shaders.js'
 
 class GlContext {
 	constructor(canvas) {
@@ -33,6 +34,25 @@ class GlContext {
 		this._cubeBufferInfo = twgl.createBufferInfoFromArrays(gl, cube)
 	}
 	get gl() { return this._gl; }
+	SwitchToFrame() {
+		var gl = this._gl;
+		if(!this._frameProgram)
+			this._frameProgram = twgl.createProgramInfo(gl, [Shaders.frame_vertex, Shaders.frame_fragment]);
+		if(this._currentProgram != this._frameProgram) {
+			gl.useProgram(this._frameProgram.program);
+			twgl.setBuffersAndAttributes(gl, this._frameProgram, this._bufferInfo);
+			this._currentProgram = this._frameProgram;
+		}
+	}
+	SetUniforms(u) {
+		twgl.setUniforms(this._currentProgram, u);
+	}
+	AcquireImageTexture(img) {
+		return null;
+	}
+	AcquireLutTexture(lut) {
+		return null;
+	}
 }
 
 export { GlContext };

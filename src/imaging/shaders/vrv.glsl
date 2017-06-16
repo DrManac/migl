@@ -1,3 +1,10 @@
+attribute vec3 position;
+attribute vec2 uv;
+attribute vec2 uv2;
+uniform mat4 projectionMatrix;
+uniform mat4 worldMatrix;
+uniform mat4 viewMatrix;
+
 varying vec3 texCoord;
 varying vec2 srcTc;
 

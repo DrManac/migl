@@ -1,3 +1,8 @@
+precision highp float;
+uniform mat4 worldMatrix;
+uniform mat4 inverseViewMatrix;
+uniform mat4 inverseWorldMatrix;
+
 #ifdef TWO_CHANNELS
 #define MAX_SIGNED_VALUE 32767.0
 #define TWO_COMPLEMENT 65536.0
