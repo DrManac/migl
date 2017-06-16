@@ -4,6 +4,7 @@
 	<meta charset="utf-8"></meta>
 	<style>
 body {
+	overflow: hidden;
 	color: #ffffff;
 	font-family:Monospace;
 	font-size:13px;
@@ -35,7 +36,17 @@ var workarea = new migl.ViewArea(document.getElementById('workarea'));
 var view = new migl.FrameView();
 workarea.SetLayout([{element: view, size: 1}]);
 
-var img = new migl.Image();
+var w = 256;
+var h = 256;
+var data = new Uint8Array(w * h);
+for(var y = 0; y < h; y++)
+{
+	for(var x = 0; x < w; x++)
+	{
+		data[y*w + x] = (x^y);
+	}
+}
+var img = new migl.Image({width: w, height: h, pixelWidth: 1}, data);
 
 view.SetImages([img]);
 

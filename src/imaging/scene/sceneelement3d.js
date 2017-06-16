@@ -12,7 +12,13 @@ class SceneElement3d {
 			worldMatrix: mworld,
 		};
 	}
-	Render(glctx) { } 
+	get world() { return this._uniforms.worldMatrix; }
+	set world(mtx) { this._uniforms.worldMatrix = mtx; }
+	get view() { return this._uniforms.viewMatrix; }
+	set view(mtx) { this._uniforms.viewMatrix = mtx; }
+	get projection() { return this._uniforms.projectionMatrix; }
+	set projection(mtx) { this._uniforms.projectionMatrix = mtx; }
+	Render(glctx) { }
 }
 
 export { SceneElement3d };

@@ -36,9 +36,8 @@ class ViewBase {
 		while (element.firstChild) {
 			element.removeChild(container.firstChild);
 		}
-		this.canvas2d.width = this.Width;
-		this.canvas2d.height = this.Height;
 		element.appendChild(this.canvas2d);
+		this._onWindowResize();
 		this._attachEventListeners();
 		this._attached = true;
 	}
@@ -122,9 +121,10 @@ class ViewBase {
 		this.canvas2d.removeEventListener("touchend", touch2Mouse, true);
 	}
 	_onWindowResize(){
-		this.canvas2d.width = this.width;
-		this.canvas2d.height = this.height;
-		this._updateTransform();
+		this.canvas2d.width = this.Width;
+		this.canvas2d.height = this.Height;
+		this._hasChanges3d = true;
+		this._hasChanges2d = true;
 	}
 	_onKeyDown(e) { }
 	_onKeyUp(e) { }
