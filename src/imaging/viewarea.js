@@ -37,12 +37,14 @@ class ViewArea {
 	}
 	SetLayout(layout) {
 		this.Clear();
-        generateGrid(this.container, layout);
+        var els = generateGrid(this.container, layout);
+		attachElements(this, els);
 	}
 }
 
 function generateGrid(root, layout, isRow)
 {
+	var res = [];
    	if(isRow == undefined)
    		isRow = true;
    	if(Array.isArray(layout))
@@ -50,7 +52,7 @@ function generateGrid(root, layout, isRow)
    		for(var i = 0; i < layout.length; i++)
    		{
    			var container = document.createElement('div');
-   			//container.style.position = 'relative';
+   			container.style.position = 'relative';
    			container.style.overflow = 'hidden';
    			container.style.display = 'flex';
    			container.style.flex = '1 1 auto';
@@ -59,13 +61,25 @@ function generateGrid(root, layout, isRow)
    			else
    				container.style['flex-direction'] = 'row';
    			root.appendChild(container);
-   			generateGrid(container, layout[i], !isRow);
+   			var tmp = generateGrid(container, layout[i], !isRow);
+			res.push(...tmp);
    		}
-   		return;
+   		return res;
    	}
    	root.style['flex-grow'] = layout.size || 1;
 	//root.className += " cell";
+	res.push({container: root, view: layout.element});
+	return res;
 }
 
+function attachElements(area, elements) {
+	for(var i = 0; i < elements.length; i++)
+	{
+		var root = elements[i].container;
+		var el = elements[i].view;
+		if(el && el.Attach)
+			el.Attach(area, root);
+	}
+}
 
 export { ViewArea };
