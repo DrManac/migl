@@ -54,8 +54,11 @@ view.SetLut(migl.Luts.list[23]);
 
 render();
 
+var t = 0;
 function render()
 {
+	// t += 0.02;
+	// view.voi = { black: 127 - 127 * Math.sin(t), white: 127 + 127 * Math.sin(t) };
 	view.Render();
 	requestAnimationFrame(render);
 }
