@@ -77,7 +77,21 @@ class GlContext {
 		return this._frameTexture;
 	}
 	AcquireLutTexture(lut) {
-		return null;
+		var gl = this._gl;
+		if(!this._lutTexture)
+			this._lutTexture = gl.createTexture();
+		if(this._lutSrc != lut)
+		{
+			gl.bindTexture(gl.TEXTURE_2D, this._lutTexture);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, lut);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+			this._lutSrc = lut;
+		}
+		return this._lutTexture;
 	}
 }
 
