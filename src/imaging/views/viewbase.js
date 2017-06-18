@@ -56,8 +56,7 @@ class ViewBase {
 		for(let i = 0; i < this._scene2d.length; i++)
 			this._scene2d[i].Render();
 	}
-	_render3d()
-	{
+	_render3d()	{
 		//determine viewport rectangle (x, y, width, height)
 		var x = 0;
 		var y = 0;

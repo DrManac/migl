@@ -1,5 +1,6 @@
 import twgl from 'twgl-base.js'
 import { Shaders } from './shaders.js'
+import { TextureCache } from './texturecache.js'
 
 class GlContext {
 	constructor(canvas) {
@@ -7,6 +8,9 @@ class GlContext {
 		this._gl = gl;
 		this.float_texture_ext = gl.getExtension('OES_texture_float');
        	this.float_texture_linear_ext = gl.getExtension('OES_texture_float_linear');
+		this.MAX_TEXTURE_SIZE = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+
+		this._volCache = new TextureCache();
 
 		gl.clearColor(0.2, 0.3, 0.2, 1.0);
 		gl.enable(gl.DEPTH_TEST);
@@ -44,6 +48,28 @@ class GlContext {
 			this._currentProgram = this._frameProgram;
 		}
 	}
+	SwitchToVr(vi, mip) {
+		var gl = this._gl;
+		var tl = this._getVolumeTextureLayout(vi);
+		if(!(this._vrProgramSigned === vi.pixelRepresentation &&
+			this._vrProgramBpp === vi.bytesPerPixel &&
+			this._vrProgramTextureCount === tl.textureCount &&
+			this._vrProgramMip === mip)) {
+				if(this._vrProgram)
+					gl.deleteProgram(this._vrProgram.program);
+				this._vrProgramSigned = vi.pixelRepresentation;
+				this._vrProgramBpp = vi.bytesPerPixel;
+				this._vrProgramTextureCount = tl.textureCount;
+				this._vrProgramMip = mip;
+				this._vrProgram = twgl.createProgramInfo(gl, [Shaders.vr_vertex, Shaders.vr_fragment(vi.pixelRepresentation, vi.bytesPerPixel, vi.textureCount, mip)]);
+		}
+
+		if(this._currentProgram != this._vrProgram) {
+			this._gl.useProgram(this._vrProgram.program);
+			twgl.setBuffersAndAttributes(this._gl, this._vrProgram, this._cubeBufferInfo);
+			this._currentProgram = this._vrProgram;
+		}
+	}
 	SetUniforms(u) {
 		twgl.setUniforms(this._currentProgram, u);
 	}
@@ -76,6 +102,63 @@ class GlContext {
 
 		return this._frameTexture;
 	}
+	AcquireVolumeTexture(vol) {
+		if(this._volCache.has(vol))
+			return this._volCache.get(vol);
+		var gl = this._gl;
+		var tl = this._getVolumeTextureLayout(vol);
+		var w = tl.textureWidth, h = tl.textureHeight, w4 = tl.stride;
+		var map;
+		var texture;
+		if(tl.textureCount > 1)
+		{
+			texture = gl.createTexture();
+			map = [texture];
+		} else {
+			map = gl.createTexture();
+			texture = map;
+		}
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		//var pixels = new Uint8Array(w * h * 4);
+		//gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+		var xo = 0, yo = 0;
+		for(var z = 0; z < vol.depth; z++)
+		{
+			//gl.texSubImage2D(gl.TEXTURE_2D, 0, xo, yo, w4, vol.height, gl.RGBA, gl.UNSIGNED_BYTE, this._srcData[z]);
+			xo += w4;
+			if(xo >= w)
+			{
+				xo = 0;
+				yo += vol.height;
+			}
+			if(yo >= h && z != vol.depth - 1) {
+				yo = 0;
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+				texture = gl.createTexture();
+				gl.bindTexture(gl.TEXTURE_2D, texture);
+				//gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+				map.push(texture);
+			}
+		}
+		//pixels = null;
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+		var voldesc = {
+			map: map,
+			textureColumns: tl.cols,
+			textureRows: tl.rows
+		};
+		this._volCache.set(vol, voldesc);
+		return voldesc;
+	}
 	AcquireLutTexture(lut) {
 		var gl = this._gl;
 		if(!this._lutTexture)
@@ -93,6 +176,51 @@ class GlContext {
 		}
 		return this._lutTexture;
 	}
+	DrawQuad() {
+		var gl = this._gl;
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+	}
+	DrawCube() {
+		var gl = this._gl;
+		gl.drawElements(gl.TRIANGLES, this._cubeBufferInfo.numElements, this._cubeBufferInfo.elementType, 0);
+	}
+	_getVolumeTextureLayout(vi) {
+		var sliceCnt = vi.depth;
+		var sz4 = vi.width * vi.height * vi.depth * 0.25 * vi.bytesPerPixel;
+		var w4 = (vi.width * vi.bytesPerPixel / 4);
+		var mt = this.MAX_TEXTURE_SIZE;
+		var w = near2(Math.sqrt(sz4));
+		if( w > mt )
+			w = mt;
+		var cols = Math.floor(w / w4);
+		var rows = Math.ceil(sliceCnt / cols);
+		w = cols * w4;
+		var h = rows * vi.height;
+		var htotal = h;
+		var textureCount = 1;
+		if(h > mt) {
+			h = mt;
+			rows = Math.floor(h / vi.height);
+			h = rows * vi.height;
+			textureCount = Math.ceil(htotal / h);
+		}
+		return {
+			textureWidth: w,
+			textureHeight: h,
+			stride: w4,
+			cols: cols,
+			rows: rows,
+			textureCount: textureCount
+		};
+	}
+}
+
+function near2(val) {
+	var pow = 1;
+	while (pow < val) {
+		pow <<= 1;
+	}
+	return pow;
 }
 
 export { GlContext };

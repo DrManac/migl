@@ -13,10 +13,9 @@ class Frame extends SceneElement3d {
 		glctx.SetUniforms({
 			map: glctx.AcquireImageTexture(this._image),
 			window: [this._black, this._white],
-			//transform: this._transform,
 			lut: glctx.AcquireLutTexture(this._lut)
 		});
-		glctx.gl.drawArrays(glctx.gl.TRIANGLE_STRIP, 0, 4);
+		glctx.DrawQuad();
 	}
 	set image(img) {
 		this._image = img;

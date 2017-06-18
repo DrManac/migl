@@ -37,7 +37,7 @@ var view = new migl.VrView();
 
 workarea.SetLayout([{element: view}]);
 
-var vol = new migl.Volume();
+var vol = new migl.Volume({width: 128, height: 64, depth: 32, pixelHeight: 2, pixelDepth: 4});
 
 view.SetVolume(vol);
 

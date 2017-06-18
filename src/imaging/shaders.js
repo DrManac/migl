@@ -13,5 +13,19 @@ export var Shaders = {
 	slice_vertex : slice_vertex,
 	slice_fragment : slice_fragment,
 	vr_vertex : vr_vertex,
-	vr_fragment : vr_fragment
+	vr_fragment : function(signed, bpp, textureCount, mip) {
+		signed = signed || false;
+		bpp = bpp || 1;
+		textureCount = textureCount || 1;
+		var subHeader = '';
+		if(mip)
+			subHeader += '#define MIP\n';
+		if(bpp == 2)
+			subHeader += '#define TWO_CHANNELS true\n';
+		if(signed)
+			subHeader += '#define SIGNED true\n';
+		if(textureCount > 1)
+			subHeader += '#define TEXTURE_COUNT '+ textureCount +'\n';
+		return subHeader + vr_fragment;
+	}
 };
