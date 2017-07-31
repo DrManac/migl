@@ -61,13 +61,13 @@ float sample(vec3 coord)
 		value = color[2] * 255.0 + color[3] * 255.0 * 256.0;
 #else
 	if(ch == 0)
-		value = color[0];
+		value = color[0] * 255.0;
 	else if(ch == 1)
-		value = color[1];
+		value = color[1] * 255.0;
 	else if(ch == 2)
-		value = color[2];
+		value = color[2] * 255.0;
 	else
-		value = color[3];
+		value = color[3] * 255.0;
 #endif
 
 #ifdef SIGNED
@@ -167,6 +167,7 @@ void main()
 	vec3 step = normalize(rayStop-rayStart) * stepSize;
 	float travel = distance(rayStop, rayStart);
 
+
 #ifdef MIP
 	float val = -10000.0;
 	for(int i = 0; i < numSamples; i++)
@@ -178,6 +179,7 @@ void main()
 	}
 	val = (val - window.x) / (window.y - window.x);
 	gl_FragColor = texture2D( lut, vec2(val, 0.5));
+	//gl_FragColor = vec4(val, val, val, 1.0);
 #else
 	vec3 light = vec3(0.0, 0.0, -1.0);
 	//light = (vec4(light, 0.0) * inverseViewMatrix * inverseWorldMatrix).xyz;

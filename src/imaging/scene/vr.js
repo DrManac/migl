@@ -15,6 +15,11 @@ class Vr extends SceneElement3d {
 		glctx.SwitchToVr(volume, this.mip);
 		glctx.SetUniforms(this._uniforms);
 		glctx.SetUniforms({
+			inverseViewMatrix: mat4.invert(mat4.create(), this._uniforms.viewMatrix),
+			inverseWorldMatrix: mat4.invert(mat4.create(), this._uniforms.worldMatrix)
+		});
+
+		glctx.SetUniforms({
 			window: [this._black, this._white],
 			lut: glctx.AcquireLutTexture(this._lut)
 		});
@@ -25,7 +30,7 @@ class Vr extends SceneElement3d {
 			volumeSize: [volume.width, volume.height, volume.depth],
 			voxelSize: volume.voxelSize,
 			colrows: [voldesc.textureColumns, voldesc.textureRows],
-			minmax: [volume.min, volume.max]
+			minmax: [volume._min, volume._max]
 		});
 
 		glctx.DrawCube();

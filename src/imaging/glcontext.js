@@ -125,7 +125,7 @@ class GlContext {
 		var xo = 0, yo = 0;
 		for(var z = 0; z < vol.depth; z++)
 		{
-			//gl.texSubImage2D(gl.TEXTURE_2D, 0, xo, yo, w4, vol.height, gl.RGBA, gl.UNSIGNED_BYTE, this._srcData[z]);
+			gl.texSubImage2D(gl.TEXTURE_2D, 0, xo, yo, w4, vol.height, gl.RGBA, gl.UNSIGNED_BYTE, vol._data[z]);
 			xo += w4;
 			if(xo >= w)
 			{
