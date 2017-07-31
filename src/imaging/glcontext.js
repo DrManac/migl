@@ -9,6 +9,7 @@ class GlContext {
 		this.float_texture_ext = gl.getExtension('OES_texture_float');
        	this.float_texture_linear_ext = gl.getExtension('OES_texture_float_linear');
 		this.MAX_TEXTURE_SIZE = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+		//this.MAX_TEXTURE_SIZE = 1024;
 
 		this._volCache = new TextureCache();
 
@@ -61,7 +62,7 @@ class GlContext {
 				this._vrProgramBpp = vi.bytesPerPixel;
 				this._vrProgramTextureCount = tl.textureCount;
 				this._vrProgramMip = mip;
-				this._vrProgram = twgl.createProgramInfo(gl, [Shaders.vr_vertex, Shaders.vr_fragment(vi.pixelRepresentation, vi.bytesPerPixel, vi.textureCount, mip)]);
+				this._vrProgram = twgl.createProgramInfo(gl, [Shaders.vr_vertex, Shaders.vr_fragment(vi.pixelRepresentation, vi.bytesPerPixel, tl.textureCount, mip)]);
 		}
 
 		if(this._currentProgram != this._vrProgram) {
@@ -125,7 +126,8 @@ class GlContext {
 		var xo = 0, yo = 0;
 		for(var z = 0; z < vol.depth; z++)
 		{
-			gl.texSubImage2D(gl.TEXTURE_2D, 0, xo, yo, w4, vol.height, gl.RGBA, gl.UNSIGNED_BYTE, vol._data[z]);
+			vol._pixelData[z].then(textureFillFunction(gl, texture, xo, yo, w4, vol.height));
+			//gl.texSubImage2D(gl.TEXTURE_2D, 0, xo, yo, w4, vol.height, gl.RGBA, gl.UNSIGNED_BYTE, vol._pixelData[z]);
 			xo += w4;
 			if(xo >= w)
 			{
@@ -212,6 +214,13 @@ class GlContext {
 			rows: rows,
 			textureCount: textureCount
 		};
+	}
+}
+
+function textureFillFunction(gl, texture, xo, yo, w4, vol_height) {
+	return function(value) {
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.texSubImage2D(gl.TEXTURE_2D, 0, xo, yo, w4, vol_height, gl.RGBA, gl.UNSIGNED_BYTE, value);
 	}
 }
 
