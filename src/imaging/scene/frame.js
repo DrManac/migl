@@ -1,20 +1,18 @@
 import { mat4 } from 'gl-matrix';
-import { SceneElement3d } from './sceneelement3d.js'
+import { LutElement } from './lutelement.js'
 
-class Frame extends SceneElement3d {
+class Frame extends LutElement {
 	constructor() {
 		super();
-		this._black = 0;
-		this._white = 255;
+		this._imageUniform = { map: null };
 	}
 	Render(glctx) {
 		glctx.SwitchToFrame();
-		glctx.SetUniforms(this._uniforms);
-		glctx.SetUniforms({
-			map: glctx.AcquireImageTexture(this._image),
-			window: [this._black, this._white],
-			lut: glctx.AcquireLutTexture(this._lut)
-		});
+		this._imageUniform.map = glctx.AcquireImageTexture(this._image);
+
+		super.Render(glctx);
+
+		glctx.SetUniforms(this._imageUniform);
 		glctx.DrawQuad();
 	}
 	set image(img) {

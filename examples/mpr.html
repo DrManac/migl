@@ -47,7 +47,25 @@ view1.SetOrts(xort, yort, zort);
 view2.SetOrts(xort, zort, yort);
 view3.SetOrts(yort, zort, xort);
 
-var vol = new migl.Volume();
+var vi = new migl.VolumeInfo({width: 128, height: 128, depth: 128, pixelHeight: 1, pixelDepth: 1});
+
+let delay = (time) => (result) => new Promise(resolve => setTimeout(() => resolve(result), time));
+
+var data = [];
+for(var z = 0; z < vi.depth; z++) {
+	var slice = new Uint8Array(vi.width * vi.height);
+	for (var y = 0; y < vi.height; y++) {
+		for (var x = 0; x < vi.width; x++) {
+			var pt = [(x - vi.width / 2) * vi.pixelWidth, (y - vi.height / 2) * vi.pixelHeight, (z - vi.depth / 2) * vi.pixelDepth];
+			var rr = pt[0] * pt[0] + pt[1] * pt[1] + pt[2] * pt[2];
+			if( rr < 4096 && rr > 3500)
+				slice[y * vi.width + x] = 255;
+		}
+	}
+	data.push(Promise.resolve(slice).then(delay(z * 10)));
+}
+
+var vol = new migl.Volume(vi, data);
 
 view1.SetVolume(vol);
 view2.SetVolume(vol);

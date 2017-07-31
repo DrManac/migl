@@ -71,6 +71,26 @@ class GlContext {
 			this._currentProgram = this._vrProgram;
 		}
 	}
+	SwitchToSlice(vi) {
+		var gl = this._gl;
+		var tl = this._getVolumeTextureLayout(vi);
+		if(!(this._sliceProgramSigned === vi.pixelRepresentation &&
+			this._sliceProgramBpp === vi.bytesPerPixel &&
+			this._sliceProgramTextureCount === tl.textureCount)) {
+				if(this._sliceProgram)
+					gl.deleteProgram(this._sliceProgram.program);
+				this._sliceProgramSigned = vi.pixelRepresentation;
+				this._sliceProgramBpp = vi.bytesPerPixel;
+				this._sliceProgramTextureCount = tl.textureCount;
+				this._sliceProgram = twgl.createProgramInfo(gl, [Shaders.slice_vertex, Shaders.slice_fragment(vi.pixelRepresentation, vi.bytesPerPixel, tl.textureCount)]);
+		}
+
+		if(this._currentProgram != this._sliceProgram) {
+			this._gl.useProgram(this._sliceProgram.program);
+			twgl.setBuffersAndAttributes(this._gl, this._sliceProgram, this._bufferInfo);
+			this._currentProgram = this._sliceProgram;
+		}
+	}
 	SetUniforms(u) {
 		twgl.setUniforms(this._currentProgram, u);
 	}

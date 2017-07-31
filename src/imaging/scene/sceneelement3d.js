@@ -18,7 +18,9 @@ class SceneElement3d {
 	set view(mtx) { this._uniforms.viewMatrix = mtx; }
 	get projection() { return this._uniforms.projectionMatrix; }
 	set projection(mtx) { this._uniforms.projectionMatrix = mtx; }
-	Render(glctx) { }
+	Render(glctx) {
+		glctx.SetUniforms(this._uniforms);
+	}
 }
 
 export { SceneElement3d };

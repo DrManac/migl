@@ -1,29 +1,24 @@
 import { mat4 } from 'gl-matrix';
-import { SceneElement3d } from './sceneelement3d.js'
+import { LutElement } from './lutelement.js'
 
-class Vr extends SceneElement3d {
+class Vr extends LutElement {
 	constructor() {
 		super();
 		mat4.perspective(this.projection, 0.392, 16/9, 0.1, 100);
 		mat4.translate(this.view, this.view, [0, 0, -10]);
-		this._black = 0;
-		this._white = 255;
 		this.mip = true;
 	}
 	Render(glctx) {
 		var volume = this._volume;
 		glctx.SwitchToVr(volume, this.mip);
-		glctx.SetUniforms(this._uniforms);
+		var voldesc = glctx.AcquireVolumeTexture(volume);
+
+		super.Render(glctx);
+
 		glctx.SetUniforms({
 			inverseViewMatrix: mat4.invert(mat4.create(), this._uniforms.viewMatrix),
 			inverseWorldMatrix: mat4.invert(mat4.create(), this._uniforms.worldMatrix)
 		});
-
-		glctx.SetUniforms({
-			window: [this._black, this._white],
-			lut: glctx.AcquireLutTexture(this._lut)
-		});
-		var voldesc = glctx.AcquireVolumeTexture(volume);
 		glctx.SetUniforms({
 			map: voldesc.map,
 			rescale: [volume.rescaleSlope, volume.rescaleIntercept],
@@ -32,7 +27,6 @@ class Vr extends SceneElement3d {
 			colrows: [voldesc.textureColumns, voldesc.textureRows],
 			minmax: [volume._min, volume._max]
 		});
-
 		glctx.DrawCube();
 	}
 	set volume(volume) {
