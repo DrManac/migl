@@ -89,13 +89,13 @@ float sample(vec3 coord)
 		value = color[2] * 255.0 + color[3] * 255.0 * 256.0;
 #else
 	if(ch == 0)
-		value = color[0];
+		value = color[0] * 255.0;
 	else if(ch == 1)
-		value = color[1];
+		value = color[1] * 255.0;
 	else if(ch == 2)
-		value = color[2];
+		value = color[2] * 255.0;
 	else
-		value = color[3];
+		value = color[3] * 255.0;
 #endif
 
 #ifdef SIGNED

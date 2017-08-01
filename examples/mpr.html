@@ -63,6 +63,7 @@ for(var z = 0; z < vi.depth; z++) {
 		}
 	}
 	data.push(Promise.resolve(slice).then(delay(z * 10)));
+	//data.push(slice);
 }
 
 var vol = new migl.Volume(vi, data);
