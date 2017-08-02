@@ -146,7 +146,7 @@ class GlContext {
 		var xo = 0, yo = 0;
 		for(var z = 0; z < vol.depth; z++)
 		{
-			vol._pixelData[z].then(textureFillFunction(gl, texture, xo, yo, w4, vol.height));
+			Promise.resolve(vol._data[z]).then(textureFillFunction(gl, texture, xo, yo, w4, vol.height));
 			//gl.texSubImage2D(gl.TEXTURE_2D, 0, xo, yo, w4, vol.height, gl.RGBA, gl.UNSIGNED_BYTE, vol._pixelData[z]);
 			xo += w4;
 			if(xo >= w)
