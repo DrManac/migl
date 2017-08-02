@@ -4,7 +4,7 @@ import { TextureCache } from './texturecache.js'
 
 class GlContext {
 	constructor(canvas) {
-		var gl = twgl.getWebGLContext(canvas);
+		var gl = twgl.getWebGLContext(canvas, {preserveDrawingBuffer: true});
 		this._gl = gl;
 		this.float_texture_ext = gl.getExtension('OES_texture_float');
        	this.float_texture_linear_ext = gl.getExtension('OES_texture_float_linear');

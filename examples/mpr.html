@@ -58,8 +58,8 @@ for(var z = 0; z < vi.depth; z++) {
 		for (var x = 0; x < vi.width; x++) {
 			var pt = [(x - vi.width / 2) * vi.pixelWidth, (y - vi.height / 2) * vi.pixelHeight, (z - vi.depth / 2) * vi.pixelDepth];
 			var rr = pt[0] * pt[0] + pt[1] * pt[1] + pt[2] * pt[2];
-			if( rr < 4096 && rr > 3500)
-				slice[y * vi.width + x] = 255;
+			if( rr < 4096 && rr > 1000)
+				slice[y * vi.width + x] = (x^y^z);
 		}
 	}
 	data.push(Promise.resolve(slice).then(delay(z * 10)));
@@ -72,9 +72,18 @@ view1.SetVolume(vol);
 view2.SetVolume(vol);
 view3.SetVolume(vol);
 
+
+view2.SetDisplacement(0.1);
+view3.SetDisplacement(0.2);
+
+var t = 0;
 render();
 function render()
 {
+	t += 0.01;
+	view1.SetDisplacement(Math.sin(t));
+	// view2.SetDisplacement(Math.sin(t));
+	// view3.SetDisplacement(Math.sin(t));
 	view1.Render();
 	view2.Render();
 	view3.Render();

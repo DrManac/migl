@@ -12,6 +12,7 @@ class SliceView extends VolumeViewBase {
 		this._xort = [1, 0, 0];
 		this._yort = [0, 1, 0];
 		this._zort = [0, 0, 1];
+		this._disp = 0;
 	}
 	SetLut(lut) {
 		lut.image.then((img) => {
@@ -23,6 +24,10 @@ class SliceView extends VolumeViewBase {
 		this._xort = xort;
 		this._yort = yort;
 		this._zort = zort;
+		this._onWindowResize();
+	}
+	SetDisplacement(disp) {
+		this._disp = disp;
 		this._onWindowResize();
 	}
 	_updateTransforms() {
@@ -48,6 +53,7 @@ class SliceView extends VolumeViewBase {
 			...this._zort, 0,
 			0, 0, 0, 1);
 		mat4.mul(this._el3d.world, ori, amtxinv);
+		mat4.translate(this._el3d.world, this._el3d.world, [0, 0, this._disp]);
 		mat4.invert(this._el3d.view, ori);
 	}
 	_onWindowResize() {
