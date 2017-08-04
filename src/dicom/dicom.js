@@ -62,7 +62,7 @@ function volumeInfoFromImageInfoStack(imageInfos) {
 	}
 	vi.pixelWidth = ii.pixelWidth;
 	vi.pixelHeight = ii.pixelHeight;
-	vi.pixelDepth = spacing;
+	vi.pixelDepth = Math.abs(spacing);
 	return vi;
 }
 
