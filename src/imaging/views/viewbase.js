@@ -21,7 +21,7 @@ class ViewBase {
 	}
 	Render() {
 		if(!this._attached) return;
-		if(this._hasChanges3d || this._scene3d.reduce((acc, val) => acc || val.hasChanges, false)) {
+		if(this._hasChanges3d) {
 			this._render3d();
 			this._hasChanges3d = false;
 		}
@@ -93,6 +93,7 @@ class ViewBase {
 		this.__onMouseUp = this._onMouseUp.bind(this);
 		this.__onMouseWheel = this._onMouseWheel.bind(this);
 		this.__onMouseOut = this._onMouseOut.bind(this);
+		this.__onGlContextStateChange = this._onGlContextStateChange.bind(this);
 
 		window.addEventListener('resize', this.__onWindowResize, false);
 		document.addEventListener('keydown', this.__onKeyDown, false);
@@ -105,6 +106,7 @@ class ViewBase {
 		this.canvas2d.addEventListener("touchstart", touch2Mouse, true);
 		this.canvas2d.addEventListener("touchmove", touch2Mouse, true);
 		this.canvas2d.addEventListener("touchend", touch2Mouse, true);
+		this._workarea.glctx.addEventListener("changed", this.__onGlContextStateChange, true);
 	}
 	_detachEventListeners() {
 		window.removeEventListener('resize', this.__onWindowResize, false);
@@ -118,12 +120,16 @@ class ViewBase {
 		this.canvas2d.removeEventListener("touchstart", touch2Mouse, true);
 		this.canvas2d.removeEventListener("touchmove", touch2Mouse, true);
 		this.canvas2d.removeEventListener("touchend", touch2Mouse, true);
+		this._workarea.glctx.removeEventListener("changed", this.__onGlContextStateChange, true);
 	}
-	_onWindowResize(){
+	_onWindowResize() {
 		this.canvas2d.width = this.Width;
 		this.canvas2d.height = this.Height;
 		this._hasChanges3d = true;
 		this._hasChanges2d = true;
+	}
+	_onGlContextStateChange() {
+		this._hasChanges3d = true;
 	}
 	_onKeyDown(e) { }
 	_onKeyUp(e) { }

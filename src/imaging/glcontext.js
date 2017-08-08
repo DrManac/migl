@@ -1,9 +1,11 @@
 import twgl from 'twgl-base.js'
-import { Shaders } from './shaders.js'
-import { TextureCache } from './texturecache.js'
+import {EventDispatcher} from '../core/eventdispatcher.js'
+import {Shaders} from './shaders.js'
+import {TextureCache} from './texturecache.js'
 
-class GlContext {
+class GlContext extends EventDispatcher {
 	constructor(canvas) {
+		super();
 		var gl = twgl.getWebGLContext(canvas, {preserveDrawingBuffer: true});
 		this._gl = gl;
 		this.float_texture_ext = gl.getExtension('OES_texture_float');
@@ -146,7 +148,9 @@ class GlContext {
 		var xo = 0, yo = 0;
 		for(var z = 0; z < vol.depth; z++)
 		{
-			vol._data[z].then(textureFillFunction(gl, texture, xo, yo, w4, vol.height)).then(() => {this.hasChanges = true;});
+			vol._data[z].then(textureFillFunction(gl, texture, xo, yo, w4, vol.height)).then(() => {
+				this.dispatchEvent({type: 'changed'});
+			});
 			//gl.texSubImage2D(gl.TEXTURE_2D, 0, xo, yo, w4, vol.height, gl.RGBA, gl.UNSIGNED_BYTE, vol._pixelData[z]);
 			xo += w4;
 			if(xo >= w)
