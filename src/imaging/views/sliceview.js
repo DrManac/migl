@@ -1,24 +1,17 @@
-import { mat4 } from 'gl-matrix';
-import { VolumeViewBase } from './volumeviewbase.js'
-import { Slice } from '../scene/slice.js'
-import { Luts } from '../lut.js'
+import {mat4} from 'gl-matrix';
+import {VolumeViewBase} from './volumeviewbase.js'
+import {Slice} from '../scene/slice.js'
+import {LutDecorator} from './lutdecorator.js'
 
 class SliceView extends VolumeViewBase {
 	constructor() {
 		super();
 		this._el3d = new Slice();
 		this.Add3dSceneElement(this._el3d);
-		this.SetLut(Luts.list[0]);
 		this._xort = [1, 0, 0];
 		this._yort = [0, 1, 0];
 		this._zort = [0, 0, 1];
 		this._disp = 0;
-	}
-	SetLut(lut) {
-		lut.image.then((img) => {
-			this._el3d._lut = img;
-			this._hasChanges3d = true;
-		});
 	}
 	SetOrts(xort, yort, zort) {
 		this._xort = xort;
@@ -61,5 +54,5 @@ class SliceView extends VolumeViewBase {
 		super._onWindowResize();
 	}
 }
-
-export { SliceView };
+class SliceViewDecorated extends LutDecorator(SliceView) { }
+export {SliceViewDecorated as SliceView};

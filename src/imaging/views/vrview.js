@@ -1,20 +1,13 @@
-import { mat4 } from 'gl-matrix';
-import { VolumeViewBase } from './volumeviewbase.js'
-import { Vr } from '../scene/vr.js'
-import { Luts } from '../lut.js'
+import {mat4} from 'gl-matrix';
+import {VolumeViewBase} from './volumeviewbase.js'
+import {Vr} from '../scene/vr.js'
+import {LutDecorator} from './lutdecorator.js'
 
 class VrView extends VolumeViewBase {
 	constructor() {
 		super();
 		this._el3d = new Vr();
 		this.Add3dSceneElement(this._el3d);
-		this.SetLut(Luts.list[0]);
-	}
-	SetLut(lut) {
-		lut.image.then((img) => {
-			this._el3d._lut = img;
-			this._hasChanges3d = true;
-		});
 	}
 	_updateProjection() {
 		var aspect = this.Width / this.Height;
@@ -26,4 +19,5 @@ class VrView extends VolumeViewBase {
 	}
 }
 
-export { VrView };
+class VrViewDecorated extends LutDecorator(VrView) { }
+export {VrViewDecorated as VrView};
