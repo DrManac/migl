@@ -21,7 +21,7 @@ class ViewBase {
 	}
 	Render() {
 		if(!this._attached) return;
-		if(this._hasChanges3d) {
+		if(this._hasChanges3d || this._scene3d.reduce((acc, val) => acc || val.hasChanges, false)) {
 			this._render3d();
 			this._hasChanges3d = false;
 		}

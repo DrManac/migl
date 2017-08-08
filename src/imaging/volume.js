@@ -20,7 +20,7 @@ class Volume extends VolumeInfo {
 		super(info);
 		this._data = data ||
 			Array.apply(null, {length: this.depth}).map(() => new Uint8Array(this.width * this.height * this.bytesPerPixel));
-		var array = this._data;
+		this._data = this._data.map(src => Promise.resolve(src));
 
 		var w = this.width, h = this.height, d = this.depth, wc = this.windowCenter, ww = this.windowWidth,
 			rs = this.rescaleSlope, ri = this.rescaleIntercept;
@@ -30,7 +30,7 @@ class Volume extends VolumeInfo {
 		this._max = 0;
 
 		this._pixelData = this._data.map(
-			(val) => Promise.resolve(val).then(
+			(val) => val.then(
 				(sliceData) => {
 					var pd;
 					if(this.pixelRepresentation) //signed

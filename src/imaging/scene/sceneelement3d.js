@@ -11,7 +11,9 @@ class SceneElement3d {
 			viewMatrix: mview,
 			worldMatrix: mworld,
 		};
+		this._hasChanges = true;
 	}
+	get hasChanges() { return this._hasChanges; }
 	get world() { return this._uniforms.worldMatrix; }
 	set world(mtx) { this._uniforms.worldMatrix = mtx; }
 	get view() { return this._uniforms.viewMatrix; }
@@ -20,6 +22,7 @@ class SceneElement3d {
 	set projection(mtx) { this._uniforms.projectionMatrix = mtx; }
 	Render(glctx) {
 		glctx.SetUniforms(this._uniforms);
+		this._hasChanges = false;
 	}
 }
 

@@ -38,6 +38,8 @@ class Slice extends LutElement {
 			0, 0, 0, 1);
 		mat4.scale(this._w2v, this._w2v, [ iw / m, ih / m, id / m]);
 		mat4.invert(this._w2v, this._w2v);
+		for(var z = 0; z < volume.depth; z++)
+			volume._data[z].then(() => {this._hasChanges = true;});
 	}
 }
 

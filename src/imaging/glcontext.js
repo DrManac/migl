@@ -36,7 +36,7 @@ class GlContext {
 		};
 
 		this._bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
-		this._cubeBufferInfo = twgl.createBufferInfoFromArrays(gl, cube)
+		this._cubeBufferInfo = twgl.createBufferInfoFromArrays(gl, cube);
 	}
 	get gl() { return this._gl; }
 	SwitchToFrame() {
@@ -146,7 +146,7 @@ class GlContext {
 		var xo = 0, yo = 0;
 		for(var z = 0; z < vol.depth; z++)
 		{
-			Promise.resolve(vol._data[z]).then(textureFillFunction(gl, texture, xo, yo, w4, vol.height));
+			vol._data[z].then(textureFillFunction(gl, texture, xo, yo, w4, vol.height)).then(() => {this.hasChanges = true;});
 			//gl.texSubImage2D(gl.TEXTURE_2D, 0, xo, yo, w4, vol.height, gl.RGBA, gl.UNSIGNED_BYTE, vol._pixelData[z]);
 			xo += w4;
 			if(xo >= w)
