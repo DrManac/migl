@@ -7,10 +7,10 @@ class LutElement extends SceneElement3d {
 		this._white = 255;
 		this._lut = null;
 	}
-	Render(glctx) {
+	Render(glctx, camera) {
 		var lut = glctx.AcquireLutTexture(this._lut);
 
-		super.Render(glctx);
+		super.Render(glctx, camera);
 
 		glctx.SetUniforms({
 			window: [this._black, this._white],

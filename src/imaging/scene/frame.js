@@ -6,11 +6,11 @@ class Frame extends LutElement {
 		super();
 		this._imageUniform = { map: null };
 	}
-	Render(glctx) {
+	Render(glctx, camera) {
 		glctx.SwitchToFrame();
 		this._imageUniform.map = glctx.AcquireImageTexture(this._image);
 
-		super.Render(glctx);
+		super.Render(glctx, camera);
 
 		glctx.SetUniforms(this._imageUniform);
 		glctx.DrawQuad();

@@ -18,9 +18,9 @@ class FrameView extends ViewBase {
 	_updateProjection() {
 		var aspect = this.Width / this.Height;
 		if(aspect > 1)
-			mat4.ortho(this._el3d.projection, -aspect, aspect, 1, -1, -1, 1);
+			mat4.ortho(this._camera.projection, -aspect, aspect, 1, -1, -1, 1);
 		else
-			mat4.ortho(this._el3d.projection, -1, 1, 1 / aspect, -1 / aspect, -1, 1);
+			mat4.ortho(this._camera.projection, -1, 1, 1 / aspect, -1 / aspect, -1, 1);
 	}
 	_onWindowResize() {
 		this._updateProjection();

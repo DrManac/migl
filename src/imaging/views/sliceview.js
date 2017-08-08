@@ -37,8 +37,8 @@ class SliceView extends VolumeViewBase {
 			mat4.fromScaling(amtx, [1, aspect, 1]);
 			mat4.fromScaling(amtxinv, [1, 1 / aspect, 1]);
 		}
-		mat4.ortho(this._el3d.projection, -1, 1, 1, -1, -1, 1);
-		mat4.mul(this._el3d.projection, this._el3d.projection, amtx);
+		mat4.ortho(this._camera.projection, -1, 1, 1, -1, -1, 1);
+		mat4.mul(this._camera.projection, this._camera.projection, amtx);
 
 		var ori = mat4.fromValues(
 			...this._xort, 0,
@@ -47,7 +47,7 @@ class SliceView extends VolumeViewBase {
 			0, 0, 0, 1);
 		mat4.mul(this._el3d.world, ori, amtxinv);
 		mat4.translate(this._el3d.world, this._el3d.world, [0, 0, this._disp]);
-		mat4.invert(this._el3d.view, ori);
+		mat4.invert(this._camera.view, ori);
 	}
 	_onWindowResize() {
 		this._updateTransforms();

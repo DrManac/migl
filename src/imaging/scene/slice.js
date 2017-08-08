@@ -6,12 +6,12 @@ class Slice extends LutElement {
 		super();
 		this._w2v = mat4.create();
 	}
-	Render(glctx) {
+	Render(glctx, camera) {
 		var volume = this._volume;
 		glctx.SwitchToSlice(volume);
 		var voldesc = glctx.AcquireVolumeTexture(volume);
 
-		super.Render(glctx);
+		super.Render(glctx, camera);
 
 		glctx.SetUniforms({world2volume: this._w2v});
 

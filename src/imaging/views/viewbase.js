@@ -1,3 +1,4 @@
+import {Camera} from '../scene/camera.js'
 
 class ViewBase {
 	constructor() {
@@ -12,6 +13,7 @@ class ViewBase {
 		this._hasChanges2d = true;
 		this._scene2d = [];
 		this._scene3d = [];
+		this._camera = new Camera();
 	}
 	Add2dSceneElement(el) {
 		this._scene2d.push(el);
@@ -80,7 +82,7 @@ class ViewBase {
 
 		//render scene elemnts
 		for(let i = 0; i < this._scene3d.length; i++)
-			this._scene3d[i].Render(this._workarea.glctx);
+			this._scene3d[i].Render(this._workarea.glctx, this._camera);
 
 		gl.disable(gl.SCISSOR_TEST);
 	}

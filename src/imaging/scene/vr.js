@@ -1,23 +1,21 @@
-import { mat4 } from 'gl-matrix';
-import { LutElement } from './lutelement.js'
+import {mat4} from 'gl-matrix';
+import {LutElement} from './lutelement.js'
 
 class Vr extends LutElement {
 	constructor() {
 		super();
-		mat4.perspective(this.projection, 0.392, 16/9, 0.1, 100);
-		mat4.translate(this.view, this.view, [0, 0, -10]);
 		this.mip = true;
 	}
-	Render(glctx) {
+	Render(glctx, camera) {
 		var volume = this._volume;
 		glctx.SwitchToVr(volume, this.mip);
 		var voldesc = glctx.AcquireVolumeTexture(volume);
 
-		super.Render(glctx);
+		super.Render(glctx, camera);
 
 		glctx.SetUniforms({
-			inverseViewMatrix: mat4.invert(mat4.create(), this._uniforms.viewMatrix),
-			inverseWorldMatrix: mat4.invert(mat4.create(), this._uniforms.worldMatrix)
+			inverseViewMatrix: mat4.invert(mat4.create(), camera.view),
+			inverseWorldMatrix: mat4.invert(mat4.create(), this.world)
 		});
 		glctx.SetUniforms({
 			map: voldesc.map,
@@ -39,4 +37,4 @@ class Vr extends LutElement {
 	}
 }
 
-export { Vr };
+export {Vr};
