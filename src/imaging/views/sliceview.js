@@ -17,13 +17,14 @@ class SliceView extends VolumeViewBase {
 		this._xort = xort;
 		this._yort = yort;
 		this._zort = zort;
-		this._onWindowResize();
+		this._updateTransforms();
 	}
 	SetDisplacement(disp) {
 		this._disp = disp;
-		this._onWindowResize();
+		this._updateTransforms();
 	}
 	_updateTransforms() {
+		super._updateTransforms();
 		var aspect = this.Width / this.Height;
 		var amtx = mat4.create();
 		var amtxinv = mat4.create();
@@ -40,18 +41,23 @@ class SliceView extends VolumeViewBase {
 		mat4.ortho(this._camera.projection, -1, 1, 1, -1, -1, 1);
 		mat4.mul(this._camera.projection, this._camera.projection, amtx);
 
-		var ori = mat4.fromValues(
-			...this._xort, 0,
-			...this._yort, 0,
-			...this._zort, 0,
-			0, 0, 0, 1);
-		mat4.mul(this._el3d.world, ori, amtxinv);
-		mat4.translate(this._el3d.world, this._el3d.world, [0, 0, this._disp]);
-		mat4.invert(this._camera.view, ori);
-	}
-	_onWindowResize() {
-		this._updateTransforms();
-		super._onWindowResize();
+		var volume = this._el3d._volume;
+		if(volume) {
+			var iw = volume.width * volume.pixelWidth;
+			var ih = volume.height * volume.pixelHeight;
+			var id = volume.depth * volume.pixelDepth;
+			var m = Math.max(iw, ih, id);
+			mat4.scale(this._camera.projection, this._camera.projection, [1/m, 1/m, 1/m]);
+			var ori = mat4.fromValues(
+				...this._xort, 0,
+				...this._yort, 0,
+				...this._zort, 0,
+				0, 0, 0, 1);
+			mat4.mul(this._el3d.world, ori, amtxinv);
+			mat4.mul(this._el3d.world, mat4.fromScaling(mat4.create(), [m, m, m]), this._el3d.world);
+			mat4.translate(this._el3d.world, this._el3d.world, [0, 0, this._disp]);
+			mat4.invert(this._camera.view, ori);
+		}
 	}
 }
 class SliceViewDecorated extends LutDecorator(SliceView) { }

@@ -33,9 +33,9 @@ body {
 
 var workarea = new migl.ViewArea(document.getElementById('workarea'));
 
-var view1 = new migl.SliceView();
-var view2 = new migl.SliceView();
-var view3 = new migl.SliceView();
+var view1 = new migl.FusionView();
+var view2 = new migl.FusionView();
+var view3 = new migl.FusionView();
 
 workarea.SetLayout([{element: view1}, {element: view2}, {element: view3}]);
 
@@ -49,9 +49,9 @@ view3.SetOrts(yort, zort, xort);
 
 migl.DragNDrop.enable(document.getElementById('workarea'), processBuffers);
 
-var vi = new migl.VolumeInfo({width: 128, height: 128, depth: 128, pixelHeight: 1, pixelDepth: 1, pixelRepresentation: 1});
-
 let delay = (time) => (result) => new Promise(resolve => setTimeout(() => resolve(result), time));
+
+var vi = new migl.VolumeInfo({width: 128, height: 128, depth: 128, pixelHeight: 1, pixelDepth: 1, pixelRepresentation: 1});
 
 var data = [];
 for(var z = 0; z < vi.depth; z++) {
@@ -67,12 +67,38 @@ for(var z = 0; z < vi.depth; z++) {
 	data.push(Promise.resolve(slice).then(delay(z * 10)));
 	//data.push(slice);
 }
+//vi.pixelWidth = 2;
 
 var vol = new migl.Volume(vi, data);
 
 view1.SetVolume(vol);
 view2.SetVolume(vol);
 view3.SetVolume(vol);
+
+
+var vi2 = new migl.VolumeInfo({width: 64, height: 64, depth: 64, pixelHeight: 1, pixelDepth: 1, pixelRepresentation: 1});
+
+var data2 = [];
+for(var z = 0; z < vi2.depth; z++) {
+	var slice = new Uint8Array(vi2.width * vi2.height);
+	for (var y = 0; y < vi2.height; y++) {
+		for (var x = 0; x < vi2.width; x++) {
+			var pt = [(x - vi2.width / 2) * vi2.pixelWidth, (y - vi2.height / 2) * vi2.pixelHeight, (z - vi2.depth / 2) * vi2.pixelDepth];
+			var rr = pt[0] * pt[0] + pt[1] * pt[1] + pt[2] * pt[2];
+			if( rr < 512 && rr > 128)
+				slice[y * vi2.width + x] = 120;
+		}
+	}
+	data2.push(Promise.resolve(slice).then(delay(z * 5)));
+	//data.push(slice);
+}
+vi2.pixelWidth = vi2.pixelHeight = vi2.pixelDepth = 2;
+
+var vol2 = new migl.Volume(vi2, data2);
+
+view1.SetVolume2(vol2);
+view2.SetVolume2(vol2);
+view3.SetVolume2(vol2);
 
 
 // view2.SetDisplacement(0.1);
@@ -99,6 +125,11 @@ function processBuffers(buffers) {
 				view1.SetVolume(vols[0]);
 				view2.SetVolume(vols[0]);
 				view3.SetVolume(vols[0]);
+			}
+			if(vols.length > 1) {
+				view1.SetVolume2(vols[1]);
+				view2.SetVolume2(vols[1]);
+				view3.SetVolume2(vols[1]);
 			}
 		}
 	);

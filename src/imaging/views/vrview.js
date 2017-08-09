@@ -11,13 +11,10 @@ class VrView extends VolumeViewBase {
 		mat4.perspective(this._camera.projection, 0.392, 16/9, 0.1, 100);
 		mat4.translate(this._camera.view, this._camera.view, [0, 0, -10]);
 	}
-	_updateProjection() {
+	_updateTransforms() {
+		super._updateTransforms();
 		var aspect = this.Width / this.Height;
 		mat4.perspective(this._camera.projection, 0.392, aspect, 0.1, 100);
-	}
-	_onWindowResize() {
-		this._updateProjection();
-		super._onWindowResize();
 	}
 }
 
