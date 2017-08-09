@@ -1,6 +1,7 @@
 import twgl from 'twgl-base.js'
 import {EventDispatcher} from '../core/eventdispatcher.js'
 import {Shaders} from './shaders.js'
+import {ProgramCache} from './programcache.js'
 import {TextureCache} from './texturecache.js'
 
 class GlContext extends EventDispatcher {
@@ -14,6 +15,7 @@ class GlContext extends EventDispatcher {
 		//this.MAX_TEXTURE_SIZE = 1024;
 
 		this._volCache = new TextureCache();
+		this._programCache = new ProgramCache();
 
 		gl.clearColor(0.2, 0.3, 0.2, 1.0);
 		gl.enable(gl.DEPTH_TEST);
@@ -54,43 +56,37 @@ class GlContext extends EventDispatcher {
 	SwitchToVr(vi, mip) {
 		var gl = this._gl;
 		var tl = this._getVolumeTextureLayout(vi);
-		if(!(this._vrProgramSigned === vi.pixelRepresentation &&
-			this._vrProgramBpp === vi.bytesPerPixel &&
-			this._vrProgramTextureCount === tl.textureCount &&
-			this._vrProgramMip === mip)) {
-				if(this._vrProgram)
-					gl.deleteProgram(this._vrProgram.program);
-				this._vrProgramSigned = vi.pixelRepresentation;
-				this._vrProgramBpp = vi.bytesPerPixel;
-				this._vrProgramTextureCount = tl.textureCount;
-				this._vrProgramMip = mip;
-				this._vrProgram = twgl.createProgramInfo(gl, [Shaders.vr_vertex, Shaders.vr_fragment(vi.pixelRepresentation, vi.bytesPerPixel, tl.textureCount, mip)]);
+		var src = [Shaders.vr_vertex, Shaders.vr_fragment(vi.pixelRepresentation, vi.bytesPerPixel, tl.textureCount, mip)];
+		var key = src[0] + src[1];
+		var program;
+		if(this._programCache.has(key))
+			program = this._programCache.get(key);
+		else {
+			program = twgl.createProgramInfo(gl, src);
+			this._programCache.set(key, program);
 		}
-
-		if(this._currentProgram != this._vrProgram) {
-			this._gl.useProgram(this._vrProgram.program);
-			twgl.setBuffersAndAttributes(this._gl, this._vrProgram, this._cubeBufferInfo);
-			this._currentProgram = this._vrProgram;
+		if(this._currentProgram != program) {
+			this._gl.useProgram(program.program);
+			twgl.setBuffersAndAttributes(this._gl, program, this._cubeBufferInfo);
+			this._currentProgram = program;
 		}
 	}
 	SwitchToSlice(vi) {
 		var gl = this._gl;
 		var tl = this._getVolumeTextureLayout(vi);
-		if(!(this._sliceProgramSigned === vi.pixelRepresentation &&
-			this._sliceProgramBpp === vi.bytesPerPixel &&
-			this._sliceProgramTextureCount === tl.textureCount)) {
-				if(this._sliceProgram)
-					gl.deleteProgram(this._sliceProgram.program);
-				this._sliceProgramSigned = vi.pixelRepresentation;
-				this._sliceProgramBpp = vi.bytesPerPixel;
-				this._sliceProgramTextureCount = tl.textureCount;
-				this._sliceProgram = twgl.createProgramInfo(gl, [Shaders.slice_vertex, Shaders.slice_fragment(vi.pixelRepresentation, vi.bytesPerPixel, tl.textureCount)]);
+		var src = [Shaders.slice_vertex, Shaders.slice_fragment(vi.pixelRepresentation, vi.bytesPerPixel, tl.textureCount)];
+		var key = src[0] + src[1];
+		var program;
+		if(this._programCache.has(key))
+			program = this._programCache.get(key);
+		else {
+			program = twgl.createProgramInfo(gl, src);
+			this._programCache.set(key, program);
 		}
-
-		if(this._currentProgram != this._sliceProgram) {
-			this._gl.useProgram(this._sliceProgram.program);
-			twgl.setBuffersAndAttributes(this._gl, this._sliceProgram, this._bufferInfo);
-			this._currentProgram = this._sliceProgram;
+		if(this._currentProgram != program) {
+			this._gl.useProgram(program.program);
+			twgl.setBuffersAndAttributes(this._gl, program, this._bufferInfo);
+			this._currentProgram = program;
 		}
 	}
 	SetUniforms(u) {
