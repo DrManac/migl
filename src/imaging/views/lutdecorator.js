@@ -36,4 +36,7 @@ export const LutDecorator = (superclass) => class extends superclass {
 		}
 		this._hasChanges3d = true;
 	}
+	setDefaultWindow(ii) {
+		this.voi = {black: ii.windowCenter - ii.windowWidth / 2, white: ii.windowCenter + ii.windowWidth / 2};
+	}
 };

@@ -46,6 +46,9 @@ class FusionView extends SliceView {
 		}
 		this._hasChanges3d = true;
 	}
+	setDefaultWindow2(ii) {
+		this.voi2 = {black: ii.windowCenter - ii.windowWidth / 2, white: ii.windowCenter + ii.windowWidth / 2};
+	}
 	_updateTransforms() {
 		super._updateTransforms();
 		mat4.copy(this._el3d2.world, this._el3d.world);
