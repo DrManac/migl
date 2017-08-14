@@ -74,7 +74,19 @@ view1.SetVolume(vol);
 view2.SetVolume(vol);
 view3.SetVolume(vol);
 
+view1.activetool = new migl.Cross();
+view2.activetool = new migl.Cross();
+view3.activetool = new migl.Cross();
 
+view1.activetool.onPointChanged = opc;
+view2.activetool.onPointChanged = opc;
+view3.activetool.onPointChanged = opc;
+
+function opc(sender) {
+	view1.SetDisplacement(sender._point[0] * zort[0] + sender._point[1] * zort[1] + sender._point[2] * zort[2]);
+	view2.SetDisplacement(sender._point[0] * yort[0] + sender._point[1] * yort[1] + sender._point[2] * yort[2]);
+	view3.SetDisplacement(sender._point[0] * xort[0] + sender._point[1] * xort[1] + sender._point[2] * xort[2]);
+}
 // view2.SetDisplacement(0.1);
 // view3.SetDisplacement(0.2);
 

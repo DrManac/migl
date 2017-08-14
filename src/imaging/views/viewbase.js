@@ -88,40 +88,13 @@ class ViewBase {
 	}
 	_attachEventListeners() {
 		this.__onWindowResize = this._onWindowResize.bind(this);
-		this.__onKeyDown = this._onKeyDown.bind(this);
-		this.__onKeyUp = this._onKeyUp.bind(this);
-		this.__onMouseMove = this._onMouseMove.bind(this);
-		this.__onMouseDown = this._onMouseDown.bind(this);
-		this.__onMouseUp = this._onMouseUp.bind(this);
-		this.__onMouseWheel = this._onMouseWheel.bind(this);
-		this.__onMouseOut = this._onMouseOut.bind(this);
 		this.__onGlContextStateChange = this._onGlContextStateChange.bind(this);
 
 		window.addEventListener('resize', this.__onWindowResize, false);
-		document.addEventListener('keydown', this.__onKeyDown, false);
-		document.addEventListener('keyup', this.__onKeyUp, false);
-		this.canvas2d.addEventListener('mousemove', this.__onMouseMove, false);
-		this.canvas2d.addEventListener('mousedown', this.__onMouseDown, false);
-		this.canvas2d.addEventListener('mouseup', this.__onMouseUp, false);
-		this.canvas2d.addEventListener('wheel', this.__onMouseWheel, false);
-		this.canvas2d.addEventListener('mouseout', this.__onMouseOut, false);
-		this.canvas2d.addEventListener("touchstart", touch2Mouse, true);
-		this.canvas2d.addEventListener("touchmove", touch2Mouse, true);
-		this.canvas2d.addEventListener("touchend", touch2Mouse, true);
 		this._workarea.glctx.addEventListener("changed", this.__onGlContextStateChange, true);
 	}
 	_detachEventListeners() {
 		window.removeEventListener('resize', this.__onWindowResize, false);
-		document.removeEventListener('keydown', this.__onKeyDown, false);
-		document.removeEventListener('keyup', this.__onKeyUp, false);
-		this.canvas2d.removeEventListener('mousemove', this.__onMouseMove, false);
-		this.canvas2d.removeEventListener('mousedown', this.__onMouseDown, false);
-		this.canvas2d.removeEventListener('mouseup', this.__onMouseUp, false);
-		this.canvas2d.removeEventListener('wheel', this.__onMouseWheel, false);
-		this.canvas2d.removeEventListener('mouseout', this.__onMouseOut, false);
-		this.canvas2d.removeEventListener("touchstart", touch2Mouse, true);
-		this.canvas2d.removeEventListener("touchmove", touch2Mouse, true);
-		this.canvas2d.removeEventListener("touchend", touch2Mouse, true);
 		this._workarea.glctx.removeEventListener("changed", this.__onGlContextStateChange, true);
 	}
 	_onWindowResize() {
@@ -133,33 +106,6 @@ class ViewBase {
 	_onGlContextStateChange() {
 		this._hasChanges3d = true;
 	}
-	_onKeyDown(e) { }
-	_onKeyUp(e) { }
-	_onMouseMove(e) { }
-	_onMouseDown(e) { }
-	_onMouseUp(e) { }
-	_onMouseWheel(e) { }
-	_onMouseOut(e) { }
-}
-
-function touch2Mouse(e)
-{
-	var theTouch = e.changedTouches[0];
-	var mouseEv;
-
-	switch(e.type)
-	{
-		case "touchstart": mouseEv="mousedown"; break;
-		case "touchend":   mouseEv="mouseup"; break;
-		case "touchmove":  mouseEv="mousemove"; break;
-		default: return;
-	}
-
-	var mouseEvent = document.createEvent("MouseEvent");
-	mouseEvent.initMouseEvent(mouseEv, true, true, window, 1, theTouch.screenX, theTouch.screenY, theTouch.clientX, theTouch.clientY, false, false, false, false, 0, null);
-	theTouch.target.dispatchEvent(mouseEvent);
-
-	e.preventDefault();
 }
 
 export { ViewBase };

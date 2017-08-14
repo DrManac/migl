@@ -2,6 +2,7 @@ import {mat4} from 'gl-matrix';
 import {VolumeViewBase} from './volumeviewbase.js'
 import {Slice} from '../scene/slice.js'
 import {LutDecorator} from './lutdecorator.js'
+import {ActiveToolDecorator} from './activetooldecorator.js'
 
 class SliceView extends VolumeViewBase {
 	constructor() {
@@ -53,12 +54,14 @@ class SliceView extends VolumeViewBase {
 				...this._yort, 0,
 				...this._zort, 0,
 				0, 0, 0, 1);
+			mat4.translate(ori, ori, [0, 0, this._disp]);
 			mat4.mul(this._el3d.world, ori, amtxinv);
-			mat4.mul(this._el3d.world, mat4.fromScaling(mat4.create(), [m, m, m]), this._el3d.world);
-			mat4.translate(this._el3d.world, this._el3d.world, [0, 0, this._disp]);
+			//mat4.mul(this._el3d.world, mat4.fromScaling(mat4.create(), [m, m, m]), this._el3d.world);
+			//mat4.translate(this._el3d.world, this._el3d.world, [0, 0, this._disp]);
+			mat4.scale(this._el3d.world, this._el3d.world, [m, m, m]);
 			mat4.invert(this._camera.view, ori);
 		}
 	}
 }
-class SliceViewDecorated extends LutDecorator(SliceView) { }
+class SliceViewDecorated extends ActiveToolDecorator(LutDecorator(SliceView)) { }
 export {SliceViewDecorated as SliceView};
