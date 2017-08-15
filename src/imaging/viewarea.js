@@ -11,6 +11,8 @@ class ViewArea {
 		canvas3d.style.top = '0px';
 		canvas3d.style.bottom = '0px';
 
+		root.style.overflow = 'hidden';
+
 		window.addEventListener('resize', onWindowResize, false);
 
 		this.container = root;
