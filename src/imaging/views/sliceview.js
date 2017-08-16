@@ -55,11 +55,13 @@ class SliceView extends VolumeViewBase {
 				...this._zort, 0,
 				0, 0, 0, 1);
 			mat4.translate(ori, ori, [0, 0, this._disp]);
-			mat4.mul(this._el3d.world, ori, amtxinv);
+			mat4.invert(this._camera.view, ori);
+			mat4.mul(this._el3d.world, this._camera.projection, this._camera.view);
+			mat4.invert(this._el3d.world, this._el3d.world);
+			//mat4.mul(this._el3d.world, ori, amtxinv);
 			//mat4.mul(this._el3d.world, mat4.fromScaling(mat4.create(), [m, m, m]), this._el3d.world);
 			//mat4.translate(this._el3d.world, this._el3d.world, [0, 0, this._disp]);
-			mat4.scale(this._el3d.world, this._el3d.world, [m, m, m]);
-			mat4.invert(this._camera.view, ori);
+			//mat4.scale(this._el3d.world, this._el3d.world, [m, m, m]);
 		}
 	}
 }
