@@ -153,12 +153,15 @@ export var Dicom = {
 	},
 	GetStudiesFromWado : function(url) {
 		var fetchInit = {headers: new Headers({"Accept" : "application/json"})};
-		fetch(url, fetchInit).then(function(response) {
+		return fetch(url, fetchInit).then(function(response) {
 			if(response.ok)
 				return response.json();
 			throw new Error('Network response was not ok.');
-		}).then(function(text) {
-
+		}).then(function(obj) {
+			for(var i = 0; i < obj.length; i++)
+			{
+				
+			}
 		}).catch(function(error) {
 			console.log(error);
 		});
