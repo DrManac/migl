@@ -150,5 +150,17 @@ export var Dicom = {
 				}));
 
 		return Promise.all(promises).then(() => studies);
+	},
+	GetStudiesFromWado : function(url) {
+		var fetchInit = {headers: new Headers({"Accept" : "application/json"})};
+		fetch(url, fetchInit).then(function(response) {
+			if(response.ok)
+				return response.json();
+			throw new Error('Network response was not ok.');
+		}).then(function(text) {
+
+		}).catch(function(error) {
+			console.log(error);
+		});
 	}
 };
