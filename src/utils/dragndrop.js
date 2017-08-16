@@ -1,5 +1,5 @@
 export var DragNDrop = {
-	enable: function(dropzone, processBuffersCallback) {
+	enable: function(dropzone, processFilesCallback) {
 		dropzone.addEventListener('dragover', handleDragOver, false);
 		dropzone.addEventListener('drop', handleFileSelect, false);
 
@@ -19,14 +19,7 @@ export var DragNDrop = {
 
 			if(!files || files.length == 0) return;
 
-			var promises = [];
-			for(var i = 0; i < files.length; i++)
-				promises.push(new Promise(
-					function(resolve, reject){
-						readFile(files[i], resolve);
-					}));
-
-			Promise.all(promises).then(processBuffersCallback);
+			processFilesCallback(files);
 		}
 		function readFile(file, resolve) {
 			var reader = new FileReader();

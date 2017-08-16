@@ -107,30 +107,48 @@ function volumesFromSeries(series) {
 	);
 }
 
+function readFile(file, resolve) {
+	var reader = new FileReader();
+	reader.onload = function(evt) {
+		var arrayBuffer = reader.result;
+		resolve(arrayBuffer);
+	}
+	reader.readAsArrayBuffer(file);
+}
+
 export var Dicom = {
 	Image : DicomImage,
 	Series : Series,
 	Study : Study,
-	LoadVolumes : function(buffers) {
-		var studyMap = {};
-		var studies = [];
-		for(var i = 0; i < buffers.length; i++) {
-			var byteArray = new Uint8Array(buffers[i]);
-			var dataSet = dicomParser.parseDicom(byteArray);
-			var studyuid = dataSet.string('x0020000d');
-			var study = studyMap[studyuid];
-			if(study === undefined) {
-				study = new Study(dataSet)
-				studyMap[studyuid] = study;
-				studies.push(study);
-			}
-			study.push(dataSet);
-		}
+	ParseVolumes : function(studies) {
 		var volSeries = ([].concat(...studies.map(st => st.series)));
 		volSeries = volSeries.filter(se => se.isVolumetric);
 		return Promise.all(volSeries.map(volumesFromSeries)).then(
 			function(volArrays) {
 				return [].concat(...volArrays);
 		});
+	},
+	GetStudiesFromFiles : function(files) {
+		var promises = [];
+		var studyMap = {};
+		var studies = [];
+		for(var i = 0; i < files.length; i++)
+			promises.push(new Promise(
+				function(resolve, reject){
+					readFile(files[i], resolve);
+				}).then(function(buffer) {
+					var byteArray = new Uint8Array(buffer);
+					var dataSet = dicomParser.parseDicom(byteArray);
+					var studyuid = dataSet.string('x0020000d');
+					var study = studyMap[studyuid];
+					if(study === undefined) {
+						study = new Study(dataSet)
+						studyMap[studyuid] = study;
+						studies.push(study);
+					}
+					study.push(dataSet);
+				}));
+
+		return Promise.all(promises).then(() => studies);
 	}
 };

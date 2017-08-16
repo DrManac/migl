@@ -47,7 +47,7 @@ view1.SetOrts(xort, yort, zort);
 view2.SetOrts(xort, zort, yort);
 view3.SetOrts(yort, zort, xort);
 
-migl.DragNDrop.enable(document.getElementById('workarea'), processBuffers);
+migl.DragNDrop.enable(document.getElementById('workarea'), processFiles);
 
 var vi = new migl.VolumeInfo({width: 128, height: 128, depth: 128, pixelHeight: 1, pixelDepth: 1, pixelRepresentation: 1});
 
@@ -104,8 +104,8 @@ function render()
 	requestAnimationFrame(render);
 }
 
-function processBuffers(buffers) {
-	migl.Dicom.LoadVolumes(buffers).then(
+function processFiles(files) {
+	migl.Dicom.GetStudiesFromFiles(files).then(migl.Dicom.ParseVolumes).then(
 		function(vols) {
 			if(vols.length > 0) {
 				view1.SetVolume(vols[0]);

@@ -134,8 +134,8 @@ function render()
 	requestAnimationFrame(render);
 }
 
-function processBuffers(buffers) {
-	migl.Dicom.LoadVolumes(buffers).then(
+function processBuffers(files) {
+	migl.Dicom.GetStudiesFromFiles(files).then(migl.Dicom.ParseVolumes).then(
 		function(vols) {
 			if(vols.length > 0) {
 				view1.SetVolume(vols[0]);
