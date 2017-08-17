@@ -1,6 +1,6 @@
 import {__moduleExports as dicomParser} from 'dicom-parser';
 import {vec3} from 'gl-matrix';
-import {DatasetWrapper} from './datasetwrapper.js';
+import {DatasetWrapper, WadoWrapper} from './datasetwrapper.js';
 import {Image as DicomImage} from './image.js';
 import {Series} from './series.js';
 import {Study} from './study.js';
@@ -112,10 +112,21 @@ export var Dicom = {
 				return response.json();
 			throw new Error('Network response was not ok.');
 		}).then(function(obj) {
+			var studyMap = {};
+			var studies = [];
 			for(var i = 0; i < obj.length; i++)
 			{
-
+				var dataSet = new WadoWrapper(obj[i]);
+				var studyuid = dataSet.string('x0020000d');
+				var study = studyMap[studyuid];
+				if(study === undefined) {
+					study = new Study(dataSet)
+					studyMap[studyuid] = study;
+					studies.push(study);
+				}
+				study.push(dataSet);
 			}
+			return studies;
 		}).catch(function(error) {
 			console.log(error);
 		});
