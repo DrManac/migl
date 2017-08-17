@@ -2,17 +2,11 @@ import {__moduleExports as dicomParser} from 'dicom-parser';
 import {Image} from './image.js';
 
 class Series {
-	constructor(study, pars) {
+	constructor(study, dataSet) {
 		this.study = study;
 	   	this.imageMap = {};
 		this.images = [];
 
-		if(pars instanceof dicomParser.DataSet)
-			this._fromDataSet(pars);
-		else
-			this._fromSeriesObject(pars);
-	}
-	_fromDataSet(dataSet) {
 		this.uid = dataSet.string('x0020000e');
 		this.date = dicomParser.parseDA(dataSet.string('x00080021'));
 		this.time = dicomParser.parseTM(dataSet.string('x00080031'));
@@ -38,23 +32,6 @@ class Series {
 				this.volumeCount = 1;
 				break;
 			default:
-		}
-	}
-	_fromSeriesObject(obj) {
-		this.uid = obj.uid;
-		this.dateTime = new Date(obj.dateTime);
-		this.modality = obj.modality;
-		this.number = obj.number;
-		this.description = obj.description;
-		this.isVolumetric = obj.isVolumetric;
-		this.numberOfSlices = obj.numberOfSlices;
-		this.volumeCount = obj.volumeCount;
-		obj.images.sort(function(a, b) { return a.number - b.number; });
-		for(var i = 0; i < obj.images.length; i++)
-		{
-			var image = new Image(obj.images[i]);
-			this.imageMap[image.uid] = image;
-			this.images.push(image);
 		}
 	}
 	push(dataSet) {

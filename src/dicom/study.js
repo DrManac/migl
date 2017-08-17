@@ -2,16 +2,10 @@ import {__moduleExports as dicomParser} from 'dicom-parser';
 import {Series} from './series.js';
 
 class Study {
-	constructor(pars) {
+	constructor(dataSet) {
 		this.seriesMap = {};
 		this.series = [];
 
-		if(pars instanceof dicomParser.DataSet)
-			this._fromDataSet(pars);
-		else
-			this._fromStudyObject(pars);
-	}
-	_fromDataSet(dataSet) {
 		this.uid = dataSet.string('x0020000d');
 	   	this.date = dicomParser.parseDA(dataSet.string('x00080020'));
 	   	this.time = dicomParser.parseTM(dataSet.string('x00080030'));
@@ -22,21 +16,6 @@ class Study {
 
 	   	this.patientName = decodeURIComponent(escape(this.patientName));
 	   	this.description = decodeURIComponent(escape(this.description));
-	}
-	_fromStudyObject(obj) {
-		this.uid = obj.uid;
-		this.dateTime = new Date(obj.dateTime);
-		this.description = obj.description;
-		this.patientId = obj.patientId;
-		this.patientName = obj.patientName;
-		obj.series.sort(function(a, b) { return a.number - b.number; });
-
-		for(var i = 0; i < obj.series.length; i++)
-		{
-			var series = new Series(this, obj.series[i]);
-			this.seriesMap[series.uid] = series;
-			this.series.push(series);
-		}
 	}
 	push(dataSet)
    	{
