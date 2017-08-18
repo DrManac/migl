@@ -25,6 +25,17 @@ class DatasetWrapper {
 class WadoWrapper {
 	constructor(dataSet) {
 		this._dataSet = dataSet;
+		var ctype;
+		this.pixelData = fetch(this._dataSet['7FE00010'].BulkDataURI).then(function(response) {
+			if(response.ok) {
+				ctype = response.headers.get('Content-Type');
+				return response.arrayBuffer();
+			}
+			throw new Error('Error during BulkData fetch.');
+		}).then(function(body) {
+			var mpdata = parse(body, ctype);
+			return mpdata[0];
+		});
 	}
 	uint16(tag, index) { return this._getInt(tag, index); }
 	int16(tag, index) { return this._getInt(tag, index); }
@@ -60,19 +71,7 @@ class WadoWrapper {
 	}
 	floatString(tag, index) { return parseFloat(this.string(tag, index)); }
 	intString(tag, index) { return parseInt(this.string(tag, index)); }
-	get pixelData() {
-		var ctype;
-		return fetch(this._dataSet['7FE00010'].BulkDataURI).then(function(response) {
-			if(response.ok) {
-				ctype = response.headers.get('Content-Type');
-				return response.arrayBuffer();
-			}
-			throw new Error('Error during BulkData fetch.');
-		}).then(function(body) {
-			var mpdata = parse(body, ctype);
-			return mpdata[0];
-		}).then(buffer => new Uint8Array(buffer));
-	}
+
 	_getInt(tag, index) {
 		tag = tag.slice(-8).toUpperCase();
 		var element = this._dataSet[tag];
