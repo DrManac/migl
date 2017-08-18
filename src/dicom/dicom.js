@@ -42,10 +42,11 @@ function volumesFromSeries(series) {
 	if(!series.isVolumetric) return Promise.resolve([new Volume()]);
 	var ns = series.numberOfSlices;
 	if(!ns) ns = series.images.length;
-	var iis = series.images.map(function(ii){
+	var iis = series.images.map(function(ii, index){
 		return {
 			ii: ii,
-			volumeIndex: ((parseInt(ii.number) - 1) / ns) | 0,
+			//volumeIndex: ((parseInt(ii.number) - 1) / ns) | 0,
+			volumeIndex: (index / ns) | 0,
 		};
 	});
 	var res = [];
