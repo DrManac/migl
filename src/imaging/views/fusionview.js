@@ -1,4 +1,4 @@
-import {mat4} from 'gl-matrix';
+import {vec3, mat4} from 'gl-matrix';
 import {Luts} from '../lut.js'
 import {Slice} from '../scene/slice.js'
 import {SliceView} from './sliceview.js'
@@ -11,8 +11,13 @@ class FusionView extends SliceView {
 		this.Add3dSceneElement(this._el3d2);
 		this.SetLut2(Luts.list[23]);
 	}
+	SetVolume(vol) {
+		super.SetVolume(vol);
+		this._updateTranslation(vol, this._el3d2._volume);
+	}
 	SetVolume2(vol) {
 		this._el3d2.volume = vol;
+		this._updateTranslation(this._el3d._volume, vol);
 		this._hasChanges3d = true;
 	}
 	SetLut2(lut) {
@@ -52,6 +57,20 @@ class FusionView extends SliceView {
 	_updateTransforms() {
 		super._updateTransforms();
 		mat4.copy(this._el3d2.world, this._el3d.world);
+	}
+	_updateTranslation(vol, vol2) {
+		if(!vol || !vol2) return;
+		var c1 = vec3.clone(vol.pos);
+		var c2 = vec3.clone(vol2.pos);
+		vec3.scaleAndAdd(c1, c1, vol.xort, vol.width * vol.pixelWidth / 2);
+		vec3.scaleAndAdd(c1, c1, vol.yort, vol.height * vol.pixelHeight / 2);
+		vec3.scaleAndAdd(c1, c1, vol.zort, vol.depth * vol.pixelDepth / 2);
+		vec3.scaleAndAdd(c2, c2, vol2.xort, vol2.width * vol2.pixelWidth / 2);
+		vec3.scaleAndAdd(c2, c2, vol2.yort, vol2.height * vol2.pixelHeight / 2);
+		vec3.scaleAndAdd(c2, c2, vol2.zort, vol2.depth * vol2.pixelDepth / 2);
+		vec3.sub(c1, c1, c2);
+		vec3.scale(c1, c1, 2);
+		this._el3d2.translation = c1;
 	}
 }
 

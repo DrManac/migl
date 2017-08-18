@@ -15,7 +15,11 @@ class Slice extends LutElement {
 
 		super.Render(glctx, camera);
 
-		glctx.SetUniforms({world2volume: this._w2v});
+		var w2v = mat4.clone(this._w2v);
+		if(this.translation)
+			mat4.translate(w2v, w2v, this.translation);
+
+		glctx.SetUniforms({world2volume: w2v});
 		glctx.SetUniforms({progressiveAlpha: this._progressiveAlpha});
 
 		glctx.SetUniforms({
