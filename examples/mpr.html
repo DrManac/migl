@@ -47,6 +47,11 @@ view1.SetOrts(xort, yort, zort);
 view2.SetOrts(xort, zort, yort);
 view3.SetOrts(yort, zort, xort);
 
+var cmp = new migl.Compass();
+view1.Add2dSceneElement(cmp);
+view2.Add2dSceneElement(cmp);
+view3.Add2dSceneElement(cmp);
+
 migl.DragNDrop.enable(document.getElementById('workarea'), processFiles);
 
 // var vi = new migl.VolumeInfo({width: 128, height: 128, depth: 128, pixelHeight: 1, pixelDepth: 1, pixelRepresentation: 1});

@@ -55,8 +55,10 @@ class ViewBase {
 	get Width() { return this._container.clientWidth; }
 	get Height() { return this._container.clientHeight; }
 	_render2d() {
+		let width = this.Width, height = this.Height;
+		this.gr.clearRect(0, 0, width, height);
 		for(let i = 0; i < this._scene2d.length; i++)
-			this._scene2d[i].Render();
+			this._scene2d[i].Render(this.gr, this._camera, {width: width, height: height});
 	}
 	_render3d()	{
 		//determine viewport rectangle (x, y, width, height)

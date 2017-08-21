@@ -10,6 +10,7 @@ class VolumeViewBase extends ViewBase {
 		super._onWindowResize();
 	}
 	_updateTransforms() {
+		this._hasChanges2d = true;
 		this._hasChanges3d = true;
 	}
 }

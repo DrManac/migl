@@ -47,6 +47,11 @@ view1.SetOrts(xort, yort, zort);
 view2.SetOrts(xort, zort, yort);
 view3.SetOrts(yort, zort, xort);
 
+var cmp = new migl.Compass();
+view1.Add2dSceneElement(cmp);
+view2.Add2dSceneElement(cmp);
+view3.Add2dSceneElement(cmp);
+
 migl.DragNDrop.enable(document.getElementById('workarea'), processBuffers);
 
 let delay = (time) => (result) => new Promise(resolve => setTimeout(() => resolve(result), time));
