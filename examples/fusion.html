@@ -47,58 +47,35 @@ view1.SetOrts(xort, yort, zort);
 view2.SetOrts(xort, zort, yort);
 view3.SetOrts(yort, zort, xort);
 
+var cmp = new migl.Compass();
+view1.Add2dSceneElement(cmp);
+view2.Add2dSceneElement(cmp);
+view3.Add2dSceneElement(cmp);
+
 migl.DragNDrop.enable(document.getElementById('workarea'), processBuffers);
 
 let delay = (time) => (result) => new Promise(resolve => setTimeout(() => resolve(result), time));
 
-var vi = new migl.VolumeInfo({width: 128, height: 128, depth: 128, pixelHeight: 1, pixelDepth: 1, pixelRepresentation: 1});
-
-var data = [];
-for(var z = 0; z < vi.depth; z++) {
-	var slice = new Uint8Array(vi.width * vi.height);
-	for (var y = 0; y < vi.height; y++) {
-		for (var x = 0; x < vi.width; x++) {
-			var pt = [(x - vi.width / 2) * vi.pixelWidth, (y - vi.height / 2) * vi.pixelHeight, (z - vi.depth / 2) * vi.pixelDepth];
-			var rr = pt[0] * pt[0] + pt[1] * pt[1] + pt[2] * pt[2];
-			if( rr < 4096 && rr > 1000)
-				slice[y * vi.width + x] = (x^y^z);
+migl.Dicom.GetStudiesFromWado('/dicom-web/studies/1.3.6.1.4.1.5962.99.1.1152916310.1104091511.1495801568086.4.0/metadata').then(migl.Dicom.ParseVolumes).then(
+	function(vols) {
+		if(vols.length > 0) {
+			view1.SetVolume(vols[0]);
+			view2.SetVolume(vols[0]);
+			view3.SetVolume(vols[0]);
+			view1.setDefaultWindow(vols[0]);
+			view2.setDefaultWindow(vols[0]);
+			view3.setDefaultWindow(vols[0]);
+		}
+		if(vols.length > 1) {
+			view1.SetVolume2(vols[1]);
+			view2.SetVolume2(vols[1]);
+			view3.SetVolume2(vols[1]);
+			view1.setDefaultWindow2(vols[1]);
+			view2.setDefaultWindow2(vols[1]);
+			view3.setDefaultWindow2(vols[1]);
 		}
 	}
-	data.push(Promise.resolve(slice).then(delay(z * 10)));
-	//data.push(slice);
-}
-//vi.pixelWidth = 2;
-
-var vol = new migl.Volume(vi, data);
-
-view1.SetVolume(vol);
-view2.SetVolume(vol);
-view3.SetVolume(vol);
-
-
-var vi2 = new migl.VolumeInfo({width: 64, height: 64, depth: 64, pixelHeight: 1, pixelDepth: 1, pixelRepresentation: 1});
-
-var data2 = [];
-for(var z = 0; z < vi2.depth; z++) {
-	var slice = new Uint8Array(vi2.width * vi2.height);
-	for (var y = 0; y < vi2.height; y++) {
-		for (var x = 0; x < vi2.width; x++) {
-			var pt = [(x - vi2.width / 2) * vi2.pixelWidth, (y - vi2.height / 2) * vi2.pixelHeight, (z - vi2.depth / 2) * vi2.pixelDepth];
-			var rr = pt[0] * pt[0] + pt[1] * pt[1] + pt[2] * pt[2];
-			if( rr < 512 && rr > 128)
-				slice[y * vi2.width + x] = 120;
-		}
-	}
-	data2.push(Promise.resolve(slice).then(delay(z * 5)));
-	//data.push(slice);
-}
-vi2.pixelWidth = vi2.pixelHeight = vi2.pixelDepth = 2;
-
-var vol2 = new migl.Volume(vi2, data2);
-
-view1.SetVolume2(vol2);
-view2.SetVolume2(vol2);
-view3.SetVolume2(vol2);
+);
 
 
 view1.activetool = new migl.Cross();
@@ -134,8 +111,8 @@ function render()
 	requestAnimationFrame(render);
 }
 
-function processBuffers(buffers) {
-	migl.Dicom.LoadVolumes(buffers).then(
+function processBuffers(files) {
+	migl.Dicom.GetStudiesFromFiles(files).then(migl.Dicom.ParseVolumes).then(
 		function(vols) {
 			if(vols.length > 0) {
 				view1.SetVolume(vols[0]);

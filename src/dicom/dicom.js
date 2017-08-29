@@ -1,43 +1,12 @@
 import {__moduleExports as dicomParser} from 'dicom-parser';
 import {vec3} from 'gl-matrix';
+import {DatasetWrapper, WadoWrapper} from './datasetwrapper.js';
 import {Image as DicomImage} from './image.js';
 import {Series} from './series.js';
 import {Study} from './study.js';
 import {ImageInfo} from '../imaging/image.js'
 import {Volume, VolumeInfo} from '../imaging/volume.js'
 
-function imageInfoFromDataSet(dataSet) {
-	var ii = {};
-	ii.number = dataSet.string('x00200013');
-	ii.width = dataSet.uint16('x00280011');
-	ii.height = dataSet.uint16('x00280010');
-	ii.pixelWidth = parseFloat(dataSet.string('x00280030', 0)) || 1;
-	ii.pixelHeight = parseFloat(dataSet.string('x00280030', 1)) || 1;
-	ii.windowCenter = parseFloat(dataSet.string('x00281050')) || 127;
-	ii.windowWidth = parseFloat(dataSet.string('x00281051')) || 255;
-	ii.rescaleIntercept = parseFloat(dataSet.string('x00281052')) || 0;
-	ii.rescaleSlope = parseFloat(dataSet.string('x00281053')) || 1;
-
-	var xx = parseFloat(dataSet.string('x00200037', 0));
-	var xy = parseFloat(dataSet.string('x00200037', 1));
-	var xz = parseFloat(dataSet.string('x00200037', 2));
-	var yx = parseFloat(dataSet.string('x00200037', 3));
-	var yy = parseFloat(dataSet.string('x00200037', 4));
-	var yz = parseFloat(dataSet.string('x00200037', 5));
-
-	var px = parseFloat(dataSet.string('x00200032', 0));
-	var py = parseFloat(dataSet.string('x00200032', 1));
-	var pz = parseFloat(dataSet.string('x00200032', 2));
-
-	ii.xort = vec3.fromValues( xx, xy, xz );
-	ii.yort = vec3.fromValues( yx, yy, yz );
-	ii.pos =  vec3.fromValues( px, py, pz );
-
-	ii.bitsAllocated = dataSet.uint16('x00280100');
-	ii.pixelRepresentation = dataSet.uint16('x00280103');
-	ii.bytesPerPixel = ii.bitsAllocated / 8;
-	return ii;
-}
 function volumeInfoFromImageInfoStack(imageInfos) {
 	var vi = {};
 	var ii = imageInfos[0];
@@ -71,66 +40,96 @@ function volumeInfoFromImageInfoStack(imageInfos) {
 
 function volumesFromSeries(series) {
 	if(!series.isVolumetric) return Promise.resolve([new Volume()]);
-	return Promise.all(series.images.map(img => img.dataSet)).then(
-		function(dataSets) {
-			var ns = series.numberOfSlices;
-			if(!ns) ns = dataSets.length;
-			var iis = dataSets.map(function(ds){
-				var ii = imageInfoFromDataSet(ds);
-				return {
-					ii: ii,
-					volumeIndex: ((parseInt(ii.number) - 1) / ns) | 0,
-					ds: ds,
-				};
-			});
-			var res = [];
-			var vc = series.volumeCount;
-			if(!vc)
-				vc = dataSets.length / ns;
-			for(var vind = 0; vind < vc; vind++)
-			{
-				var filtered = iis.filter(function(el) { return el.volumeIndex === vind; });
-				var vi = volumeInfoFromImageInfoStack(filtered.map(function(el) { return el.ii; }));
-				var data = [];
-				for(var i = 0; i < filtered.length; i++)
-				{
-					var dataSet = filtered[i].ds;
-					var ii = filtered[i].ii;
-					var pixelDataElement = dataSet.elements.x7fe00010;
-					var pixelData = new Uint8Array(dataSet.byteArray.buffer, pixelDataElement.dataOffset, pixelDataElement.length);
-					data.push(pixelData);
-				}
-				res.push(new Volume(vi, data));
-			}
-			return res;
-		}
-	);
+	var ns = series.numberOfSlices;
+	if(!ns) ns = series.images.length;
+	var iis = series.images.map(function(ii, index){
+		return {
+			ii: ii,
+			//volumeIndex: ((parseInt(ii.number) - 1) / ns) | 0,
+			volumeIndex: (index / ns) | 0,
+		};
+	});
+	var res = [];
+	var vc = series.volumeCount;
+	if(!vc)
+		vc = series.images.length / ns;
+	for(var vind = 0; vind < vc; vind++)
+	{
+		var filtered = iis.filter(function(el) { return el.volumeIndex === vind; });
+		var vi = volumeInfoFromImageInfoStack(filtered.map(function(el) { return el.ii; }));
+		var data = [];
+		for(var i = 0; i < filtered.length; i++)
+			data.push(filtered[i].ii.pixelData);
+		res.push(new Volume(vi, data));
+	}
+	return res;
+}
+
+function readFile(file, resolve) {
+	var reader = new FileReader();
+	reader.onload = function(evt) {
+		var arrayBuffer = reader.result;
+		resolve(arrayBuffer);
+	}
+	reader.readAsArrayBuffer(file);
 }
 
 export var Dicom = {
 	Image : DicomImage,
 	Series : Series,
 	Study : Study,
-	LoadVolumes : function(buffers) {
-		var studyMap = {};
-		var studies = [];
-		for(var i = 0; i < buffers.length; i++) {
-			var byteArray = new Uint8Array(buffers[i]);
-			var dataSet = dicomParser.parseDicom(byteArray);
-			var studyuid = dataSet.string('x0020000d');
-			var study = studyMap[studyuid];
-			if(study === undefined) {
-				study = new Study(dataSet)
-				studyMap[studyuid] = study;
-				studies.push(study);
-			}
-			study.push(dataSet);
-		}
+	ParseVolumes : function(studies) {
 		var volSeries = ([].concat(...studies.map(st => st.series)));
 		volSeries = volSeries.filter(se => se.isVolumetric);
-		return Promise.all(volSeries.map(volumesFromSeries)).then(
-			function(volArrays) {
-				return [].concat(...volArrays);
+		return [].concat(...volSeries.map(volumesFromSeries));
+	},
+	GetStudiesFromFiles : function(files) {
+		var promises = [];
+		var studyMap = {};
+		var studies = [];
+		for(var i = 0; i < files.length; i++)
+			promises.push(new Promise(
+				function(resolve, reject){
+					readFile(files[i], resolve);
+				}).then(function(buffer) {
+					var byteArray = new Uint8Array(buffer);
+					var dataSet = new DatasetWrapper(dicomParser.parseDicom(byteArray));
+					var studyuid = dataSet.string('x0020000d');
+					var study = studyMap[studyuid];
+					if(study === undefined) {
+						study = new Study(dataSet)
+						studyMap[studyuid] = study;
+						studies.push(study);
+					}
+					study.push(dataSet);
+				}));
+
+		return Promise.all(promises).then(() => studies);
+	},
+	GetStudiesFromWado : function(url) {
+		var fetchInit = {headers: new Headers({"Accept" : "application/json"})};
+		return fetch(url, fetchInit).then(function(response) {
+			if(response.ok)
+				return response.json();
+			throw new Error('Network response was not ok.');
+		}).then(function(obj) {
+			var studyMap = {};
+			var studies = [];
+			for(var i = 0; i < obj.length; i++)
+			{
+				var dataSet = new WadoWrapper(obj[i]);
+				var studyuid = dataSet.string('x0020000d');
+				var study = studyMap[studyuid];
+				if(study === undefined) {
+					study = new Study(dataSet)
+					studyMap[studyuid] = study;
+					studies.push(study);
+				}
+				study.push(dataSet);
+			}
+			return studies;
+		}).catch(function(error) {
+			console.log(error);
 		});
 	}
 };
