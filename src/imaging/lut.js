@@ -1,3 +1,6 @@
+import grayscaleUrl from './lut/grayscale.png';
+import warmMetalUrl from './lut/WarmMetal.png';
+
 class Lut {
 	constructor(name, url) {
 		this.name = name;
@@ -30,6 +33,8 @@ class Lut {
 }
 
 var Luts = {
+	default: new Lut("Grayscale", grayscaleUrl),
+	defaultOverlay: new Lut("WarmMetal", warmMetalUrl),
 	urlMap: {},
 	list: [],
 	push: function(lut) {
@@ -46,7 +51,7 @@ var Luts = {
 	}
 };
 
-Luts.push(new Lut("Grayscale", "lut/grayscale.png"));
+//Luts.push(new Lut("Grayscale", "lut/grayscale.png"));
 Luts.push(new Lut("16Step", "lut/16Step.png"));
 //Luts.push(new Lut("30PercBlack", "lut/30PercBlack.png"));
 Luts.push(new Lut("ADACIsocontour", "lut/ADACIsocontour.png"));
@@ -79,7 +84,7 @@ Luts.push(new Lut("Spectrum10Step", "lut/Spectrum10Step.png"));
 Luts.push(new Lut("spohaRainbow", "lut/spohaRainbow.png"));
 Luts.push(new Lut("Stars", "lut/Stars.png"));
 Luts.push(new Lut("Thal", "lut/Thal.png"));
-Luts.push(new Lut("WarmMetal", "lut/WarmMetal.png"));
+//Luts.push(new Lut("WarmMetal", "lut/WarmMetal.png"));
 //Luts.push(new Lut("XT6Cardiac", "lut/XT6Cardiac.png"));
 
 export { Lut, Luts };

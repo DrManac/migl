@@ -3,7 +3,7 @@ import {Luts} from '../lut.js'
 export const LutDecorator = (superclass) => class extends superclass {
 	constructor() {
 		super();
-		this.SetLut(Luts.list[0]);
+		this.SetLut(Luts.default);
 	}
 	SetLut(lut) {
 		lut.image.then((img) => {

@@ -9,7 +9,7 @@ class FusionView extends SliceView {
 		this._el3d2 = new Slice();
 		this._el3d2.progressiveAlpha = true;
 		this.Add3dSceneElement(this._el3d2);
-		this.SetLut2(Luts.list[23]);
+		this.SetLut2(Luts.defaultOverlay);
 	}
 	SetVolume(vol) {
 		super.SetVolume(vol);
