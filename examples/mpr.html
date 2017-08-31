@@ -36,6 +36,7 @@ var workarea = new migl.ViewArea(document.getElementById('workarea'));
 var view1 = new migl.SliceView();
 var view2 = new migl.SliceView();
 var view3 = new migl.SliceView();
+var cview = new migl.CompositeView(view1, view2, view3);
 
 workarea.SetLayout([{element: view1}, {element: view2}, {element: view3}]);
 
@@ -48,9 +49,7 @@ view2.SetOrts(xort, zort, yort);
 view3.SetOrts(yort, zort, xort);
 
 var cmp = new migl.Compass();
-view1.Add2dSceneElement(cmp);
-view2.Add2dSceneElement(cmp);
-view3.Add2dSceneElement(cmp);
+cview.Add2dSceneElement(cmp);
 
 migl.DragNDrop.enable(document.getElementById('workarea'), processFiles);
 
@@ -82,43 +81,26 @@ migl.DragNDrop.enable(document.getElementById('workarea'), processFiles);
 migl.Dicom.GetStudiesFromWado('/dicom-web/studies/1.3.12.2.1107.5.6.1.1234.1110.0.1046585785986187/metadata').then(migl.Dicom.ParseVolumes).then(
 	function(vols) {
 		if(vols.length > 0) {
-			view1.SetVolume(vols[0]);
-			view2.SetVolume(vols[0]);
-			view3.SetVolume(vols[0]);
-			view1.setDefaultWindow(vols[0]);
-			view2.setDefaultWindow(vols[0]);
-			view3.setDefaultWindow(vols[0]);
+			cview.SetVolume(vols[0]);
+			cview.setDefaultWindow(vols[0]);
 		}
 	}
 );
 
-view1.activetool = new migl.Cross();
-view2.activetool = new migl.Cross();
-view3.activetool = new migl.Cross();
-
-view1.activetool.onPointChanged = opc;
-view2.activetool.onPointChanged = opc;
-view3.activetool.onPointChanged = opc;
+var cross = new migl.Cross();
+cview.activetool = cross;
+cross.onPointChanged = opc;
 
 function opc(sender) {
 	view1.SetDisplacement(sender._point[0] * zort[0] + sender._point[1] * zort[1] + sender._point[2] * zort[2]);
 	view2.SetDisplacement(sender._point[0] * yort[0] + sender._point[1] * yort[1] + sender._point[2] * yort[2]);
 	view3.SetDisplacement(sender._point[0] * xort[0] + sender._point[1] * xort[1] + sender._point[2] * xort[2]);
 }
-// view2.SetDisplacement(0.1);
-// view3.SetDisplacement(0.2);
 
-var t = 0;
 render();
 function render()
 {
-	t += 0.01;
-	// view1.SetDisplacement(Math.sin(t));
-	// view2.SetDisplacement(Math.sin(t));
-	// view3.SetDisplacement(Math.sin(t));
-	view1.Render();
-	view2.Render();
-	view3.Render();
+	cview.Render();
 	requestAnimationFrame(render);
 }
 
@@ -126,16 +108,11 @@ function processFiles(files) {
 	migl.Dicom.GetStudiesFromFiles(files).then(migl.Dicom.ParseVolumes).then(
 		function(vols) {
 			if(vols.length > 0) {
-				view1.SetVolume(vols[0]);
-				view2.SetVolume(vols[0]);
-				view3.SetVolume(vols[0]);
-				view1.setDefaultWindow(vols[0]);
-				view2.setDefaultWindow(vols[0]);
-				view3.setDefaultWindow(vols[0]);
+				cview.SetVolume(vols[0]);
+				cview.setDefaultWindow(vols[0]);
 			}
 		}
 	);
-	//alert(buffers);
 }
 
 	</script>
