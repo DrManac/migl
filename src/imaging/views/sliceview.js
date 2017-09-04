@@ -1,4 +1,4 @@
-import {mat4} from 'gl-matrix';
+import {vec3, mat4} from 'gl-matrix';
 import {VolumeViewBase} from './volumeviewbase.js'
 import {Slice} from '../scene/slice.js'
 import {LutDecorator} from './lutdecorator.js'
@@ -13,6 +13,7 @@ class SliceView extends VolumeViewBase {
 		this._yort = [0, 1, 0];
 		this._zort = [0, 0, 1];
 		this._disp = 0;
+		this._cameraTransform = mat4.create();
 	}
 	SetOrts(xort, yort, zort) {
 		this._xort = xort;
@@ -20,8 +21,12 @@ class SliceView extends VolumeViewBase {
 		this._zort = zort;
 		this._updateTransforms();
 	}
-	SetDisplacement(disp) {
-		this._disp = disp;
+	setSlicePoint(pt) {
+		this._disp = vec3.dot(pt, this._zort);
+		this._updateTransforms();
+	}
+	applyCameraTransform(transform) {
+		mat4.mul(this._cameraTransform, this._cameraTransform, transform);
 		this._updateTransforms();
 	}
 	_updateTransforms() {
@@ -49,6 +54,7 @@ class SliceView extends VolumeViewBase {
 				0, 0, 0, 1);
 			mat4.translate(ori, ori, [0, 0, this._disp]);
 			mat4.invert(this._camera.view, ori);
+			mat4.mul(this._camera.view, this._camera.view, this._cameraTransform);
 			mat4.mul(this._el3d.world, this._camera.projection, this._camera.view);
 			mat4.invert(this._el3d.world, this._el3d.world);
 		}

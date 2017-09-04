@@ -26,7 +26,10 @@ export const ActiveToolDecorator = (superclass) => class extends superclass {
 		this._activeTool = null;
 	}
 	get activetool() { return this._activeTool; }
-	set activetool(tool) { this._activeTool = tool; }
+	set activetool(tool) {
+		this._activeTool = tool;
+		tool.view = this;
+	}
 	_attachEventListeners() {
 		super._attachEventListeners();
 		this.__onKeyDown = this._onKeyDown.bind(this);
@@ -71,15 +74,15 @@ export const ActiveToolDecorator = (superclass) => class extends superclass {
 	}
 	_onMouseMove(e) {
 		if(this._activeTool && this._activeTool.mmove)
-			this._activeTool.mmove(this._convertMouseEvent(e));
+			this._activeTool.mmove(this._convertMouseEvent(e), this._camera);
 	}
 	_onMouseDown(e) {
 		if(this._activeTool && this._activeTool.mdown)
-			this._activeTool.mdown(this._convertMouseEvent(e));
+			this._activeTool.mdown(this._convertMouseEvent(e), this._camera);
 	}
 	_onMouseUp(e) {
 		if(this._activeTool && this._activeTool.mup)
-			this._activeTool.mup(this._convertMouseEvent(e));
+			this._activeTool.mup(this._convertMouseEvent(e), this._camera);
 	}
 	_onMouseWheel(e) {
 		if(this._activeTool && this._activeTool.mwheel)
@@ -95,20 +98,16 @@ export const ActiveToolDecorator = (superclass) => class extends superclass {
 		var y = e.clientY - rect.top;
 		var normedX = x / this.Width;
 		var normedY = y / this.Height;
-		var centeredX = 2 * normedX - 1;
-		var centeredY = 2 * normedY - 1;
-		var vpi = mat4.clone(this._camera.projection);
-		mat4.mul(vpi, vpi, this._camera.view);
-		mat4.invert(vpi, vpi);
+		var clipX = 2 * normedX - 1;
+		var clipY = 1 - 2 * normedY;
 		return {
 			button: e.button,
 			x: x,
 			y: y,
 			normedX: normedX,
 			normedY: normedY,
-			centeredX: centeredX,
-			centeredY: centeredY,
-			world: vec3.transformMat4(vec3.create(), [centeredX, -centeredY, 0], vpi)
+			clipX: clipX,
+			clipY: clipY
 		}
 	}
 };

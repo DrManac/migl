@@ -60,6 +60,7 @@ class CompositeView {
 		for(let i = 0; i < this._views.length; i++)
 			if('activetool' in this._views[i])
 				this._views[i].activetool = tool;
+		tool.view = this;
 	}
 	SetVolume(vol) {
 		for(let i = 0; i < this._views.length; i++)
@@ -70,6 +71,16 @@ class CompositeView {
 		for(let i = 0; i < this._views.length; i++)
 			if(this._views[i].SetVolume2)
 				this._views[i].SetVolume2(vol);
+	}
+	setSlicePoint(pt) {
+		for(let i = 0; i < this._views.length; i++)
+			if(this._views[i].setSlicePoint)
+				this._views[i].setSlicePoint(pt);
+	}
+	applyCameraTransform(transform) {
+		for(let i = 0; i < this._views.length; i++)
+			if(this._views[i].applyCameraTransform)
+				this._views[i].applyCameraTransform(transform);
 	}
 }
 

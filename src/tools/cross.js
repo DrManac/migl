@@ -2,21 +2,21 @@ import {vec3} from 'gl-matrix';
 
 class Cross {
 	constructor() {
+		this.view = null;
 		this.pressed = false;
 		this._point = vec3.create();
 	}
-	mmove(e) {
+	mmove(e, camera) {
 		if(!this.pressed) return;
-		this._point = e.world;
-		if(this.onPointChanged)
-			this.onPointChanged(this);
+		this._point = camera.clipToWorld(e.clipX, e.clipY);
+		if(this.view)
+			this.view.setSlicePoint(this._point);
 	}
-	mdown(e) {
+	mdown(e, camera) {
 		this.pressed = true;
-		//console.log(e.world);
-		this._point = e.world;
-		if(this.onPointChanged)
-			this.onPointChanged(this);
+		this._point = camera.clipToWorld(e.clipX, e.clipY);
+		if(this.view)
+			this.view.setSlicePoint(this._point);
 	}
 	mup(e) {
 		this.pressed = false;
