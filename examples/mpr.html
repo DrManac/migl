@@ -58,9 +58,9 @@ var xort = [1, 0, 0];
 var yort = [0, 1, 0];
 var zort = [0, 0, -1];
 
-view1.SetOrts(xort, yort, zort);
-view2.SetOrts(xort, zort, yort);
-view3.SetOrts(yort, zort, xort);
+view1.SetOrts(xort, yort);
+view2.SetOrts(xort, zort);
+view3.SetOrts(yort, zort);
 
 var cmp = new migl.Compass();
 cview.Add2dSceneElement(cmp);
@@ -68,6 +68,7 @@ cview.Add2dSceneElement(cmp);
 var tools = {
 	cross: new migl.tools.Cross(),
 	pan: new migl.tools.Pan(),
+	rotate: new migl.tools.Rotate(),
 };
 
 var btns = document.getElementById('toolstrip').getElementsByTagName('input');

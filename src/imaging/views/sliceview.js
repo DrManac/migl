@@ -15,10 +15,10 @@ class SliceView extends VolumeViewBase {
 		this._disp = 0;
 		this._cameraTransform = mat4.create();
 	}
-	SetOrts(xort, yort, zort) {
+	SetOrts(xort, yort) {
 		this._xort = xort;
 		this._yort = yort;
-		this._zort = zort;
+		vec3.cross(this._zort, xort, yort);
 		this._updateTransforms();
 	}
 	setSlicePoint(pt) {

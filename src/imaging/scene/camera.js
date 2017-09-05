@@ -8,10 +8,14 @@ class Camera {
 	}
 	clipToWorld(x, y, z) {
 		z = z || 0;
+		let vpi = this.projectionViewInverse;
+		return vec3.transformMat4(vec3.create(), [x, y, z], vpi);
+	}
+	get projectionViewInverse() {
 		var vpi = mat4.clone(this.projection);
 		mat4.mul(vpi, vpi, this.view);
 		mat4.invert(vpi, vpi);
-		return vec3.transformMat4(vec3.create(), [x, y, z], vpi);
+		return vpi;
 	}
 }
 
