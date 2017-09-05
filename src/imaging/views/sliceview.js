@@ -22,6 +22,7 @@ class SliceView extends VolumeViewBase {
 		this._updateTransforms();
 	}
 	setSlicePoint(pt) {
+		pt = vec3.transformMat4(vec3.create(), pt, this._cameraTransform);
 		this._disp = vec3.dot(pt, this._zort);
 		this._updateTransforms();
 	}
