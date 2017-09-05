@@ -14,22 +14,36 @@ body {
 	margin: 0px;
 }
 
-#workarea
-{
+#root {
 	position: absolute;
 	left:0px;
 	right:0px;
 	top:0px;
 	bottom: 0px;
 	display: flex;
+	flex-direction: column;
+}
+
+#workarea {
+	position: relative;
+	display: flex;
+	flex: 1 1 auto;
 }
 	</style>
 </head>
 <body>
-<div id="workarea">
+<div id="root">
+	<div id="toolstrip">
+		<label><input type="radio" name="tool" value="cross">Cross</label>
+		<label><input type="radio" name="tool" value="pan">Pan</label>
+		<label><input type="radio" name="tool" value="zoom">Zoom</label>
+		<label><input type="radio" name="tool" value="rotate">Rotate</label>
+	</div>
+	<div id="workarea"></div>
 </div>
-	<script src="../build/migl.js"></script>
-	<script>
+<script src="../build/migl.js"></script>
+<script>
+
 
 var workarea = new migl.ViewArea(document.getElementById('workarea'));
 
@@ -50,6 +64,21 @@ view3.SetOrts(yort, zort, xort);
 
 var cmp = new migl.Compass();
 cview.Add2dSceneElement(cmp);
+
+var tools = {
+	cross: new migl.tools.Cross(),
+	pan: new migl.tools.Pan(),
+};
+
+var btns = document.getElementById('toolstrip').getElementsByTagName('input');
+for(let btn of btns)
+	btn.addEventListener('click', selectTool);
+
+function selectTool(e) {
+	var tool = tools[e.currentTarget.value];
+	if(tool)
+		cview.activetool = tool;
+}
 
 migl.DragNDrop.enable(document.getElementById('workarea'), processFiles);
 
@@ -87,11 +116,6 @@ migl.Dicom.GetStudiesFromWado('/dicom-web/studies/1.3.12.2.1107.5.6.1.1234.1110.
 	}
 );
 
-var cross = new migl.tools.Cross();
-//cview.activetool = cross;
-
-var pan = new migl.tools.Pan();
-cview.activetool = pan;
 
 render();
 function render()
