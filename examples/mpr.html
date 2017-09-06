@@ -1,17 +1,19 @@
+<!DOCTYPE html>
 <html>
 <head>
 	<title>MPR View</title>
 	<meta charset="utf-8"></meta>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 	<style>
 body {
 	color: #ffffff;
-	font-family:Monospace;
+/*	font-family:Monospace;
 	font-size:13px;
 	text-align:center;
-	font-weight: bold;
+	font-weight: bold;*/
 
 	background-color: #AAAAAA;
-	margin: 0px;
 }
 
 #root {
@@ -33,13 +35,36 @@ body {
 </head>
 <body>
 <div id="root">
-	<div id="toolstrip">
-		<label><input type="radio" name="tool" value="cross">Cross</label>
-		<label><input type="radio" name="tool" value="pan">Pan</label>
-		<label><input type="radio" name="tool" value="zoom">Zoom</label>
-		<label><input type="radio" name="tool" value="rotate">Rotate</label>
-		<label><input type="radio" name="tool" value="window">Window</label>
-		<label><input type="checkbox" id="invertcb">Invert</label>
+	<div id="toolstrip" class="btn-toolbar" data-toggle="buttons">
+		<div class="btn-group mr-2">
+			<label class="btn btn-dark active"><input type="radio" name="tool" value="cross">
+				<span class="fa-stack">
+					<i class="fa fa-crosshairs fa-stack-2x"></i>
+				</span> Cross</label>
+			<label class="btn btn-dark"><input type="radio" name="tool" value="pan">
+				<span class="fa-stack">
+					<i class="fa fa-hand-paper-o fa-stack-2x"></i>
+				</span> Pan</label>
+			<label class="btn btn-dark"><input type="radio" name="tool" value="zoom">
+				<span class="fa-stack">
+					<i class="fa fa-search fa-stack-2x"></i>
+				</span> Zoom</label>
+			<label class="btn btn-dark"><input type="radio" name="tool" value="rotate">
+				<span class="fa-stack">
+					<i class="fa fa-refresh fa-stack-2x"></i>
+				</span> Rotate</label>
+		</div>
+		<div class="btn-group">
+			<label class="btn btn-dark"><input type="radio" name="tool" value="window">
+				<span class="fa-stack">
+					<i class="fa fa-adjust fa-stack-2x"></i>
+				</span> Window</label>
+			<label class="btn btn-dark" id="invertcb"><input type="checkbox">
+				<span class="fa-stack">
+					<i class="fa fa-square fa-stack-2x"></i>
+					<i class="fa fa-adjust fa-stack-1x text-dark"></i>
+				</span> Invert</label>
+		</div>
 	</div>
 	<div id="workarea"></div>
 </div>
@@ -79,19 +104,19 @@ var tools = {
 	window: new migl.tools.Window(),
 };
 
-var btns = document.getElementById('toolstrip').getElementsByTagName('input');
+var btns = document.getElementById('toolstrip').getElementsByTagName('label');
 for(let btn of btns)
 	btn.addEventListener('click', selectTool);
 document.getElementById('invertcb').addEventListener('click', invert);
 
 function selectTool(e) {
-	var tool = tools[e.currentTarget.value];
+	var tool = tools[e.currentTarget.firstChild.value];
 	if(tool)
 		cview.activetool = tool;
 }
 
 function invert(e) {
-	cview.invert = e.currentTarget.checked;
+	cview.invert = !cview.invert;
 }
 
 migl.DragNDrop.enable(document.getElementById('workarea'), processFiles);
@@ -158,5 +183,7 @@ function processFiles(files) {
 }
 
 	</script>
-</body>
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script></body>
 </html>
