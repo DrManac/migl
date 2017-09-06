@@ -14,6 +14,7 @@ class SliceView extends VolumeViewBase {
 		this._zort = [0, 0, 1];
 		this._disp = 0;
 		this._cameraTransform = mat4.create();
+		this._zoom = 1;
 	}
 	SetOrts(xort, yort) {
 		this._xort = xort;
@@ -30,6 +31,11 @@ class SliceView extends VolumeViewBase {
 		mat4.mul(this._cameraTransform, this._cameraTransform, transform);
 		this._updateTransforms();
 	}
+	get zoom() { return this._zoom; }
+	set zoom(zoom) {
+		this._zoom = zoom;
+		this._updateTransforms();
+	}
 	_updateTransforms() {
 		super._updateTransforms();
 		var aspect = this.Width / this.Height;
@@ -40,6 +46,7 @@ class SliceView extends VolumeViewBase {
 			mat4.fromScaling(amtx, [1, aspect, 1]);
 		mat4.ortho(this._camera.projection, -1, 1, 1, -1, -1, 1);
 		mat4.mul(this._camera.projection, this._camera.projection, amtx);
+		mat4.multiplyScalar(this._camera.projection, this._camera.projection, this._zoom);
 
 		var volume = this._el3d._volume;
 		if(volume) {
@@ -53,7 +60,7 @@ class SliceView extends VolumeViewBase {
 				...this._yort, 0,
 				...this._zort, 0,
 				0, 0, 0, 1);
-			mat4.translate(ori, ori, [0, 0, this._disp]);
+			mat4.translate(ori, ori, [0, 0, this._disp * this._zoom]);
 			mat4.invert(this._camera.view, ori);
 			mat4.mul(this._camera.view, this._camera.view, this._cameraTransform);
 			mat4.mul(this._el3d.world, this._camera.projection, this._camera.view);
