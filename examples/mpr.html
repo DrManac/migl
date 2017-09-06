@@ -13,7 +13,8 @@ body {
 	text-align:center;
 	font-weight: bold;*/
 
-	background-color: #AAAAAA;
+	/*background-color: #AAAAAA;*/
+	background-color: #000000;
 }
 
 #root {
@@ -55,6 +56,13 @@ body {
 				</span> Rotate</label>
 		</div>
 		<div class="btn-group">
+			<div class="btn-group" role="group">
+				<button class="btn btn-dark dropdown-toggle" type="button" id="lutButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<img src="lut/grayscale.png" width="32" height="32" id='lutImg'> LUT
+				</button>
+				<div class="dropdown-menu" aria-labelledby="lutButton" id="lutMenu">
+				</div>
+			</div>
 			<label class="btn btn-dark"><input type="radio" name="tool" value="window">
 				<span class="fa-stack">
 					<i class="fa fa-adjust fa-stack-2x"></i>
@@ -117,6 +125,21 @@ function selectTool(e) {
 
 function invert(e) {
 	cview.invert = !cview.invert;
+}
+
+var lutMenu = document.getElementById('lutMenu');
+for(let lut of [].concat([migl.Luts.default, migl.Luts.defaultOverlay], migl.Luts.list.slice(0, 19))) {
+	var el = document.createElement('button');
+		/*<button class="dropdown-item" type="button">Action</button>*/
+	el.type = 'button';
+	el.classList.add('dropdown-item');
+	el.innerHTML = `<img src='${lut.url}' width="32" height="16"> ${lut.name}`;
+	el.lut = lut;
+	el.addEventListener('click', function(e) {
+		cview.SetLut(e.currentTarget.lut);
+		document.getElementById('lutImg').src = e.currentTarget.lut.url;
+	});
+	lutMenu.appendChild(el);
 }
 
 migl.DragNDrop.enable(document.getElementById('workarea'), processFiles);
