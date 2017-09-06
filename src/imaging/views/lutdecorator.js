@@ -20,8 +20,8 @@ export const LutDecorator = (superclass) => class extends superclass {
 		this._hasChanges3d = true;
 	}
 	get voi() { return this.invert ?
-		{ black: this._el3d._black, white: this._el3d._white } :
-		{ black: this._el3d._white, white: this._el3d._black };
+		{ black: this._el3d._white, white: this._el3d._black } :
+		{ black: this._el3d._black, white: this._el3d._white };
 	}
 	set voi(voi) {
 		if(voi.black > voi.white - 1)
