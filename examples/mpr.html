@@ -39,6 +39,7 @@ body {
 		<label><input type="radio" name="tool" value="zoom">Zoom</label>
 		<label><input type="radio" name="tool" value="rotate">Rotate</label>
 		<label><input type="radio" name="tool" value="window">Window</label>
+		<label><input type="checkbox" id="invertcb">Invert</label>
 	</div>
 	<div id="workarea"></div>
 </div>
@@ -76,11 +77,16 @@ var tools = {
 var btns = document.getElementById('toolstrip').getElementsByTagName('input');
 for(let btn of btns)
 	btn.addEventListener('click', selectTool);
+document.getElementById('invertcb').addEventListener('click', invert);
 
 function selectTool(e) {
 	var tool = tools[e.currentTarget.value];
 	if(tool)
 		cview.activetool = tool;
+}
+
+function invert(e) {
+	cview.invert = e.currentTarget.checked;
 }
 
 migl.DragNDrop.enable(document.getElementById('workarea'), processFiles);
