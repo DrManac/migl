@@ -38,6 +38,7 @@ body {
 		<label><input type="radio" name="tool" value="pan">Pan</label>
 		<label><input type="radio" name="tool" value="zoom">Zoom</label>
 		<label><input type="radio" name="tool" value="rotate">Rotate</label>
+		<label><input type="radio" name="tool" value="window">Window</label>
 	</div>
 	<div id="workarea"></div>
 </div>
@@ -69,6 +70,7 @@ var tools = {
 	cross: new migl.tools.Cross(),
 	pan: new migl.tools.Pan(),
 	rotate: new migl.tools.Rotate(),
+	window: new migl.tools.Window(),
 };
 
 var btns = document.getElementById('toolstrip').getElementsByTagName('input');
