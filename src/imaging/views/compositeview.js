@@ -62,6 +62,12 @@ class CompositeView {
 				this._views[i].activetool = tool;
 		tool.view = this;
 	}
+	get zoom() { return this._views.length > 0 ? this._views[0].zoom : 1; }
+	set zoom(zoom) {
+		for(let i = 0; i < this._views.length; i++)
+			if('zoom' in this._views[i])
+				this._views[i].zoom = zoom;
+	}
 	SetVolume(vol) {
 		for(let i = 0; i < this._views.length; i++)
 			if(this._views[i].SetVolume)
