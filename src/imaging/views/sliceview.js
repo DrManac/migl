@@ -46,7 +46,7 @@ class SliceView extends VolumeViewBase {
 			mat4.fromScaling(amtx, [1, aspect, 1]);
 		mat4.ortho(this._camera.projection, -1, 1, 1, -1, -1, 1);
 		mat4.mul(this._camera.projection, this._camera.projection, amtx);
-		mat4.multiplyScalar(this._camera.projection, this._camera.projection, this._zoom);
+		mat4.scale(this._camera.projection, this._camera.projection, [this._zoom, this._zoom, this._zoom]);
 
 		var volume = this._el3d._volume;
 		if(volume) {
@@ -60,7 +60,7 @@ class SliceView extends VolumeViewBase {
 				...this._yort, 0,
 				...this._zort, 0,
 				0, 0, 0, 1);
-			mat4.translate(ori, ori, [0, 0, this._disp * this._zoom]);
+			mat4.translate(ori, ori, [0, 0, this._disp]);
 			mat4.invert(this._camera.view, ori);
 			mat4.mul(this._camera.view, this._camera.view, this._cameraTransform);
 			mat4.mul(this._el3d.world, this._camera.projection, this._camera.view);
