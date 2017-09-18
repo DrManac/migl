@@ -128,6 +128,42 @@ function invert(e) {
 	cview.invert = !cview.invert;
 }
 
+//migl.Luts.add("Grayscale", "lut/grayscale.png");
+migl.Luts.add("16Step", "lut/16Step.png");
+//migl.Luts.add(new Lut("30PercBlack", "lut/30PercBlack.png");
+migl.Luts.add("ADACIsocontour", "lut/ADACIsocontour.png");
+migl.Luts.add("Auxctq", "lut/Auxctq.png");
+migl.Luts.add("BWInvLog", "lut/BWInvLog.png");
+migl.Luts.add("BWLog", "lut/BWLog.png");
+//migl.Luts.add("BWParabolic", "lut/BWParabolic.png");
+//migl.Luts.add("Cyclic", "lut/Cyclic.png");
+//migl.Luts.add("Designer", "lut/Designer.png");
+migl.Luts.add("ECATRainbow", "lut/ECATRainbow.png");
+//Luts.add("Edges", "lut/Edges.png");
+migl.Luts.add("Heart", "lut/Heart.png");
+migl.Luts.add("Hotbody", "lut/Hotbody.png");
+migl.Luts.add("Isocount", "lut/Isocount.png");
+migl.Luts.add("Linear", "lut/Linear.png");
+migl.Luts.add("MicroDeltaHotMetal", "lut/MicroDeltaHotMetal.png");
+migl.Luts.add("PagePhase", "lut/PagePhase.png");
+migl.Luts.add("Parathyroid", "lut/Parathyroid.png");
+//migl.Luts.add("PETSUVMask", "lut/PETSUVMask.png");
+migl.Luts.add("PIXEF", "lut/PIXEF.png");
+//migl.Luts.add("QGS10Step", "lut/QGS10Step.png");
+//migl.Luts.add("Rainbow", "lut/Rainbow.png");
+migl.Luts.add("Red", "lut/Red.png");
+migl.Luts.add("Region", "lut/Region.png");
+//migl.Luts.add("Siemens PET SUV 50", "lut/Siemens%20PET%20SUV%2050.png");
+//migl.Luts.add(Siemens PET SUV 75", "lut/lut/Siemens%20PET%20SUV%2075.png");
+migl.Luts.add("Smart1", "lut/Smart1.png");
+migl.Luts.add("Spectrum", "lut/Spectrum.png");
+migl.Luts.add("Spectrum10Step", "lut/Spectrum10Step.png");
+migl.Luts.add("spohaRainbow", "lut/spohaRainbow.png");
+migl.Luts.add("Stars", "lut/Stars.png");
+migl.Luts.add("Thal", "lut/Thal.png");
+//migl.Luts.add("WarmMetal", "lut/WarmMetal.png");
+//migl.Luts.add("XT6Cardiac", "lut/XT6Cardiac.png");
+
 var lutMenu = document.getElementById('lutMenu');
 for(let lut of [].concat([migl.Luts.default, migl.Luts.defaultOverlay], migl.Luts.list.slice(0, 19))) {
 	var el = document.createElement('button');
@@ -170,7 +206,7 @@ migl.DragNDrop.enable(document.getElementById('workarea'), processFiles);
 // view2.SetVolume(vol);
 // view3.SetVolume(vol);
 
-var studiesPromise = migl.Dicom.GetStudiesFromWado('/dicom-web/studies/1.3.12.2.1107.5.6.1.1234.1110.0.1046585785986187/metadata');
+var studiesPromise = migl.Dicom.GetStudiesFromWado('/dicom-web/studies/1.3.6.1.4.1.5962.99.1.1152916310.1104091511.1495801568086.2719.0/metadata');
 
 studiesPromise.then(migl.Dicom.ParseVolumes).then(
 	function(vols) {
