@@ -72,10 +72,14 @@ class CompositeView {
 	}
 	get activetool() { return this._views.length > 0 ? this._views[0].activetool : null; }
 	set activetool(tool) {
+		var commonTool = !(typeof tool == 'function');
 		for(let i = 0; i < this._views.length; i++)
 			if('activetool' in this._views[i])
-				this._views[i].activetool = tool;
-		tool.view = this;
+				if(commonTool)
+					this._views[i].activetool = tool;
+				else
+					this._views[i].activetool = new tool();
+		if(commonTool) tool.view = this;
 	}
 	get zoom() { return this._views.length > 0 ? this._views[0].zoom : 1; }
 	set zoom(zoom) {
