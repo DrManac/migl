@@ -8,7 +8,7 @@ export const LutDecorator = (superclass) => class extends superclass {
 	SetLut(lut) {
 		lut.image.then((img) => {
 			this._el3d._lut = img;
-			this._hasChanges3d = true;
+			this.Invalidate3d();
 		});
 	}
 	get invert() { return this._el3d._black > this._el3d._white; }
@@ -17,7 +17,7 @@ export const LutDecorator = (superclass) => class extends superclass {
 		var tmp = this._el3d._black;
 		this._el3d._black = this._el3d._white;
 		this._el3d._white = tmp;
-		this._hasChanges3d = true;
+		this.Invalidate3d();
 	}
 	get voi() { return this.invert ?
 		{ black: this._el3d._white, white: this._el3d._black } :
@@ -34,7 +34,7 @@ export const LutDecorator = (superclass) => class extends superclass {
 			this._el3d._black = voi.black;
 			this._el3d._white = voi.white;
 		}
-		this._hasChanges3d = true;
+		this.Invalidate();
 	}
 	setDefaultWindow(ii) {
 		this.voi = {black: ii.windowCenter - ii.windowWidth / 2, white: ii.windowCenter + ii.windowWidth / 2};

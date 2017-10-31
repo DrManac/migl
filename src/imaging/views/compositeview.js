@@ -17,6 +17,21 @@ class CompositeView {
 			if(this._views[i].Render)
 				this._views[i].Render();
 	}
+	Invalidate() {
+		for(let i = 0; i < this._views.length; i++)
+			if(this._views[i].Invalidate)
+				this._views[i].Invalidate();
+	}
+	Invalidate3d() {
+		for(let i = 0; i < this._views.length; i++)
+			if(this._views[i].Invalidate3d)
+				this._views[i].Invalidate3d();
+	}
+	InvalidateOverlay() {
+		for(let i = 0; i < this._views.length; i++)
+			if(this._views[i].InvalidateOverlay)
+				this._views[i].InvalidateOverlay();
+	}
 	SetLut(lut) {
 		for(let i = 0; i < this._views.length; i++)
 			if(this._views[i].SetLut)

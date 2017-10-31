@@ -17,9 +17,11 @@ class ViewBase {
 	}
 	Add2dSceneElement(el) {
 		this._scene2d.push(el);
+		this.InvalidateOverlay();
 	}
 	Add3dSceneElement(el) {
 		this._scene3d.push(el);
+		this.Invalidate3d();
 	}
 	Render() {
 		if(!this._attached) return;
@@ -31,6 +33,16 @@ class ViewBase {
 			this._render2d();
 			this._hasChanges2d = false;
 		}
+	}
+	Invalidate() {
+		this._hasChanges2d = true;
+		this._hasChanges3d = true;
+	}
+	Invalidate3d() {
+		this._hasChanges3d = true;
+	}
+	InvalidateOverlay() {
+		this._hasChanges2d = true;
 	}
 	Attach(area, element) {
 		this._workarea = area;
@@ -102,11 +114,10 @@ class ViewBase {
 	_onWindowResize() {
 		this.canvas2d.width = this.Width;
 		this.canvas2d.height = this.Height;
-		this._hasChanges3d = true;
-		this._hasChanges2d = true;
+		this.Invalidate();
 	}
 	_onGlContextStateChange() {
-		this._hasChanges3d = true;
+		this.Invalidate3d();
 	}
 }
 
