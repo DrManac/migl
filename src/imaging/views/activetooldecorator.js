@@ -30,6 +30,11 @@ export const ActiveToolDecorator = (superclass) => class extends superclass {
 		this._activeTool = tool;
 		tool.view = this;
 	}
+	_render2d() {
+		super._render2d();
+		if(this._activeTool && this._activeTool.Render)
+			this._activeTool.Render(this.gr, this._camera, {width: this.Width, height: this.Height});
+	}
 	_attachEventListeners() {
 		super._attachEventListeners();
 		this.__onKeyDown = this._onKeyDown.bind(this);
