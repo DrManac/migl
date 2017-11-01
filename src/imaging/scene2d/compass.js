@@ -7,8 +7,8 @@ class Compass {
 		this._yort = vec3.create();
 		this._zort = vec3.create();
 	}
-	Render(ctx, camera, vprect) {
-		var width = vprect.width, height = vprect.height;
+	Render(ctx, camera) {
+		var width = camera.width, height = camera.height;
 		//should be camera.projection * camera.view and then y inverted (or yort is (0, -1, 0))
 		//works as is as long mat4.ortho(this._camera.projection, -1, 1, 1, -1, -1, 1);
 		mat3.fromMat4(this._ori, camera.view);

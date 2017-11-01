@@ -8,14 +8,19 @@ class Interval {
 	get length() {
 		return vec3.len(vec3.sub(vec3.create(), this.end, this.begin));
 	}
-	Render(ctx, camera, vprect) {
-		var width = vprect.width, height = vprect.height;
-		var mtx = mat4.create();
-		mat4.mul(mtx, camera.projection, camera.view);
-		mat4.mul(mtx, mat4.fromTranslation(mat4.create(), [1, -1, 1]), mtx);
-		mat4.mul(mtx, mat4.fromScaling(mat4.create(), [width * .5, -height * .5, .5]), mtx);
-		var begin = vec3.transformMat4(vec3.create(), this.begin, mtx);
-		var end = vec3.transformMat4(vec3.create(), this.end, mtx);
+	capture(e, camera, captureDistance) {
+		var pos = vec2.fromValues(e.x, e.y);
+		var begin = camera.worldToScreen(this.begin);
+		var end = camera.worldToScreen(this.end);
+		var sub = vec2.sub(vec2.create(), end, begin);
+		var dis = Math.abs(sub[1] * pos[0] - sub[0] * pos[1] + end[0] * begin[1] - end[1] * begin[0]) / vec2.len(sub);
+		var capturedLine = dis < captureDistance &&
+			(vec2.distance(pos, begin) + vec2.distance(pos, end) < vec2.len(sub) + 2 * captureDistance);
+		return capturedLine;
+	}
+	Render(ctx, camera) {
+		var begin = camera.worldToScreen(this.begin);
+		var end = camera.worldToScreen(this.end);
 		var anchor = vec3.lerp(vec3.create(), begin, end, 0.5);
 		var dir = vec2.normalize(vec2.create(), vec2.sub(vec2.create(), end, begin));
 

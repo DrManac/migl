@@ -70,7 +70,7 @@ class ViewBase {
 		let width = this.Width, height = this.Height;
 		this.gr.clearRect(0, 0, width, height);
 		for(let i = 0; i < this._scene2d.length; i++)
-			this._scene2d[i].Render(this.gr, this._camera, {width: width, height: height});
+			this._scene2d[i].Render(this.gr, this._camera);
 	}
 	_render3d()	{
 		//determine viewport rectangle (x, y, width, height)
@@ -112,8 +112,8 @@ class ViewBase {
 		this._workarea.glctx.removeEventListener("changed", this.__onGlContextStateChange, true);
 	}
 	_onWindowResize() {
-		this.canvas2d.width = this.Width;
-		this.canvas2d.height = this.Height;
+		this._camera.width = this.canvas2d.width = this.Width;
+		this._camera.height = this.canvas2d.height = this.Height;
 		this.Invalidate();
 	}
 	_onGlContextStateChange() {

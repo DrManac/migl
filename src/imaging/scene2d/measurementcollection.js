@@ -2,9 +2,9 @@ class MeasurementCollection {
 	constructor() {
 		this.objects = [];
 	}
-	Render(ctx, camera, vprect) {
+	Render(ctx, camera) {
 		for(let i = 0; i < this.length; i++)
-			this.objects[i].Render(ctx, camera, vprect);
+			this.objects[i].Render(ctx, camera);
 	}
 	get length() {
 		return this.objects.length;

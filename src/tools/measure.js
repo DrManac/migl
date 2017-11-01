@@ -2,6 +2,8 @@ import {vec3, mat4} from 'gl-matrix';
 import {Interval} from '../imaging/scene2d/interval.js'
 import {MeasurementCollection} from '../imaging/scene2d/measurementcollection.js'
 
+const CAPTURE_DISTANCE = 10;
+
 const MeasureDecorator = (superclass) => class extends superclass {
 	constructor() {
 		super();
@@ -18,7 +20,7 @@ const MeasureDecorator = (superclass) => class extends superclass {
 		}
 		for(let i = 0; i < this.objects.length; i++) {
 			let obj = this.objects.get(i);
-			if(obj && obj.capture && obj.capture(e, camera)) {
+			if(obj && obj.capture && obj.capture(e, camera, CAPTURE_DISTANCE)) {
 				this.edittool = obj.editTool;
 				this.edittool.object = obj;
 				this.edittool.view = this.view;
