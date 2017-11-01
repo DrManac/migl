@@ -16,7 +16,7 @@ class Interval {
 		var anchor = vec3.lerp(vec3.create(), begin, end, 0.5);
 		var dir = vec2.normalize(vec2.create(), vec2.sub(vec2.create(), end, begin));
 
-		var text = vec2.len(vec2.sub(vec2.create(), end, begin)).toFixed(1);
+		var text = vec2.len(vec2.sub(vec2.create(), this.end, this.begin)).toFixed(1);
 
 		var tpx_ = 0;
 		var tpy_ = 20;
