@@ -16,9 +16,9 @@ class MeasurementCollection {
 		this.objects.push(obj);
 	}
 	remove(obj) {
-		var idx = this.indexOf(obj);
+		var idx = this.objects.indexOf(obj);
 		if(idx > -1)
-			this.splice(idx, 1);
+			this.objects.splice(idx, 1);
 	}
 }
 

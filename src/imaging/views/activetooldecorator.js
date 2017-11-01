@@ -33,7 +33,7 @@ export const ActiveToolDecorator = (superclass) => class extends superclass {
 	_render2d() {
 		super._render2d();
 		if(this._activeTool && this._activeTool.Render)
-			this._activeTool.Render(this.gr, this._camera, {width: this.Width, height: this.Height});
+			this._activeTool.Render(this.gr, this._camera);
 	}
 	_attachEventListeners() {
 		super._attachEventListeners();

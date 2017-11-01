@@ -18,7 +18,8 @@ class Interval {
 			(vec2.distance(pos, begin) + vec2.distance(pos, end) < vec2.len(sub) + 2 * captureDistance);
 		return capturedLine;
 	}
-	Render(ctx, camera) {
+	Render(ctx, camera, options) {
+		options = options || {};
 		var begin = camera.worldToScreen(this.begin);
 		var end = camera.worldToScreen(this.end);
 		var anchor = vec3.lerp(vec3.create(), begin, end, 0.5);
@@ -36,13 +37,13 @@ class Interval {
 		ctx.beginPath();
 		ctx.moveTo(begin[0], begin[1]);
 		ctx.lineTo(end[0], end[1]);
-		ctx.strokeStyle = "red";
+		ctx.strokeStyle = options.color || "red";
 		ctx.stroke();
 
 		ctx.beginPath();
 		ctx.moveTo(anchor[0], anchor[1]);
 		ctx.lineTo(tpx, tpy);
-		ctx.strokeStyle = "red";
+		ctx.strokeStyle = options.color || "red";
 		ctx.setLineDash([5]);
 		ctx.stroke();
 
