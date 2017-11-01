@@ -122,24 +122,43 @@ class MeasureEdit {
 	}
 	mmove(e, camera) {
 		if(this.view) this.view.InvalidateOverlay();
+		var pos = vec2.fromValues(e.x, e.y);
+		var begin = camera.worldToScreen(this.object.begin);
+		var end = camera.worldToScreen(this.object.end);
+
 		if (!this.pressed) {
-			let pos = vec2.fromValues(e.x, e.y);
-			let begin = camera.worldToScreen(this.object.begin);
-			let end = camera.worldToScreen(this.object.end);
 			this.beginIsActive = vec2.distance(pos, begin) < CAPTURE_DISTANCE;
 			this.endIsActive = vec2.distance(pos, end) < CAPTURE_DISTANCE;
+			this.boxIsActive = (pos[0] >= this.object.trect.minx && pos[0] <= this.object.trect.maxx && pos[1] >= this.object.trect.miny && pos[1] <= this.object.trect.maxy);
 			return;
 		}
 		var posWorld = camera.clipToWorld(e.clipX, e.clipY);
-		if(!this.endIsActive)
+		if(!this.endIsActive && !this.boxIsActive)
 			vec3.add(this.object.begin, this.object.begin, vec3.sub(vec3.create(), posWorld, this.prev));
-		if(!this.beginIsActive)
+		if(!this.beginIsActive && !this.boxIsActive)
 			vec3.add(this.object.end, this.object.end, vec3.sub(vec3.create(), posWorld, this.prev));
+		if(this.boxIsActive) {
+			var anchor = vec2.lerp(vec2.create(), begin, end, this.object.anchor);
+			var sub = vec2.sub(vec2.create(), end, begin);
+			var dir = vec2.normalize(vec2.create(), sub);
+			var norm = vec2.fromValues(dir[1], -dir[0]);
+			var tp = vec2.scaleAndAdd(vec2.create(), anchor, dir, this.object.texpos[0]);
+			vec2.scaleAndAdd(tp, tp, norm, this.object.texpos[1]);
+			vec2.add(tp, tp, vec2.sub(vec2.create(), pos, this.prevScreen));
+			this.object.anchor = vec2.dot(sub, vec2.sub(vec2.create(), tp, begin)) / vec2.dot(sub, sub);
+			if(this.object.anchor > 1.0) this.object.anchor = 1.0;
+			if(this.object.anchor < 0.0) this.object.anchor = 0.0;
+			vec2.lerp(anchor, begin, end, this.object.anchor);
+			vec2.sub(tp, tp, anchor);
+			vec2.set(this.object.texpos, vec2.dot(tp, dir), vec2.dot(tp, norm));
+		}
 		this.prev = posWorld;
+		this.prevScreen = pos;
 	}
 	mdown(e, camera) {
 		this.pressed = true;
 		this.prev = camera.clipToWorld(e.clipX, e.clipY);
+		this.prevScreen = vec2.fromValues(e.x, e.y);
 	}
 	mup(e, camera) {
 		this.pressed = false;
