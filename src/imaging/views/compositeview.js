@@ -17,6 +17,21 @@ class CompositeView {
 			if(this._views[i].Render)
 				this._views[i].Render();
 	}
+	Invalidate() {
+		for(let i = 0; i < this._views.length; i++)
+			if(this._views[i].Invalidate)
+				this._views[i].Invalidate();
+	}
+	Invalidate3d() {
+		for(let i = 0; i < this._views.length; i++)
+			if(this._views[i].Invalidate3d)
+				this._views[i].Invalidate3d();
+	}
+	InvalidateOverlay() {
+		for(let i = 0; i < this._views.length; i++)
+			if(this._views[i].InvalidateOverlay)
+				this._views[i].InvalidateOverlay();
+	}
 	SetLut(lut) {
 		for(let i = 0; i < this._views.length; i++)
 			if(this._views[i].SetLut)
@@ -57,10 +72,14 @@ class CompositeView {
 	}
 	get activetool() { return this._views.length > 0 ? this._views[0].activetool : null; }
 	set activetool(tool) {
+		var commonTool = !(typeof tool == 'function');
 		for(let i = 0; i < this._views.length; i++)
 			if('activetool' in this._views[i])
-				this._views[i].activetool = tool;
-		tool.view = this;
+				if(commonTool)
+					this._views[i].activetool = tool;
+				else
+					this._views[i].activetool = new tool();
+		if(commonTool) tool.view = this;
 	}
 	get zoom() { return this._views.length > 0 ? this._views[0].zoom : 1; }
 	set zoom(zoom) {

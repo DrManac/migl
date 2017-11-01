@@ -9,8 +9,8 @@ class Text {
 		this.x = options.x || 0;
 		this.y = options.y || 0;
 	}
-	Render(ctx, camera, vprect) {
-		var width = vprect.width, height = vprect.height;
+	Render(ctx, camera) {
+		var width = camera.width, height = camera.height;
 		ctx.save();
 		ctx.fillStyle = this.fillStyle;
 		ctx.font = this.font;

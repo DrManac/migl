@@ -55,7 +55,7 @@ body {
 					<i class="fa fa-refresh fa-stack-2x"></i>
 				</span> Rotate</label>
 		</div>
-		<div class="btn-group">
+		<div class="btn-group mr-2">
 			<div class="btn-group" role="group">
 				<button class="btn btn-dark dropdown-toggle" type="button" id="lutButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<img src="lut/grayscale.png" width="32" height="32" id='lutImg'> LUT
@@ -73,6 +73,13 @@ body {
 					<i class="fa fa-adjust fa-stack-1x text-dark"></i>
 				</span> Invert</label>
 		</div>
+		<div class="btn-group">
+			<label class="btn btn-dark"><input type="radio" name="tool" value="measure">
+				<span class="fa-stack">
+					<i class="fa fa-pencil fa-stack-2x"></i>
+				</span> Measure</label>
+		</div>
+
 	</div>
 	<div id="workarea"></div>
 </div>
@@ -123,6 +130,7 @@ view3.Add2dSceneElement(textur);
 
 var tools = {
 	cross: new migl.tools.Cross(),
+	measure: migl.tools.Measure,
 	pan: new migl.tools.Pan(),
 	rotate: new migl.tools.Rotate(),
 	window: new migl.tools.Window(),

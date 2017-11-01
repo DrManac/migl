@@ -17,9 +17,11 @@ class ViewBase {
 	}
 	Add2dSceneElement(el) {
 		this._scene2d.push(el);
+		this.InvalidateOverlay();
 	}
 	Add3dSceneElement(el) {
 		this._scene3d.push(el);
+		this.Invalidate3d();
 	}
 	Render() {
 		if(!this._attached) return;
@@ -31,6 +33,16 @@ class ViewBase {
 			this._render2d();
 			this._hasChanges2d = false;
 		}
+	}
+	Invalidate() {
+		this._hasChanges2d = true;
+		this._hasChanges3d = true;
+	}
+	Invalidate3d() {
+		this._hasChanges3d = true;
+	}
+	InvalidateOverlay() {
+		this._hasChanges2d = true;
 	}
 	Attach(area, element) {
 		this._workarea = area;
@@ -58,7 +70,7 @@ class ViewBase {
 		let width = this.Width, height = this.Height;
 		this.gr.clearRect(0, 0, width, height);
 		for(let i = 0; i < this._scene2d.length; i++)
-			this._scene2d[i].Render(this.gr, this._camera, {width: width, height: height});
+			this._scene2d[i].Render(this.gr, this._camera);
 	}
 	_render3d()	{
 		//determine viewport rectangle (x, y, width, height)
@@ -100,13 +112,12 @@ class ViewBase {
 		this._workarea.glctx.removeEventListener("changed", this.__onGlContextStateChange, true);
 	}
 	_onWindowResize() {
-		this.canvas2d.width = this.Width;
-		this.canvas2d.height = this.Height;
-		this._hasChanges3d = true;
-		this._hasChanges2d = true;
+		this._camera.width = this.canvas2d.width = this.Width;
+		this._camera.height = this.canvas2d.height = this.Height;
+		this.Invalidate();
 	}
 	_onGlContextStateChange() {
-		this._hasChanges3d = true;
+		this.Invalidate3d();
 	}
 }
 
