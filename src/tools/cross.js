@@ -24,6 +24,26 @@ class Cross {
 	mwheel(e) {
 
 	}
+	Render(ctx, camera) {
+		ctx.save();
+		var pt = camera.worldToScreen(this._point);
+		var gap = 10;
+		var len = 1000;
+		ctx.save();
+		ctx.beginPath();
+		ctx.moveTo(pt[0] + gap, pt[1]);
+		ctx.lineTo(pt[0] + len, pt[1]);
+		ctx.moveTo(pt[0] - gap, pt[1]);
+		ctx.lineTo(pt[0] - len, pt[1]);
+		ctx.moveTo(pt[0], pt[1] + gap);
+		ctx.lineTo(pt[0], pt[1] + len);
+		ctx.moveTo(pt[0], pt[1] - gap);
+		ctx.lineTo(pt[0], pt[1] - len);
+		ctx.strokeStyle = 'red';
+		ctx.stroke();
+		ctx.restore();
+	}
+
 }
 
 export {Cross};
