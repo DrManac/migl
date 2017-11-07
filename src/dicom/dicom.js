@@ -78,12 +78,13 @@ export var Dicom = {
 	Image : DicomImage,
 	Series : Series,
 	Study : Study,
-	ParseVolumes : function(studies) {
+	volumesFromSeries : volumesFromSeries,
+	volumesFromStudies : function(studies) {
 		var volSeries = ([].concat(...studies.map(st => st.series)));
 		volSeries = volSeries.filter(se => se.isVolumetric);
 		return [].concat(...volSeries.map(volumesFromSeries));
 	},
-	GetStudiesFromFiles : function(files) {
+	getStudiesFromFiles : function(files) {
 		var promises = [];
 		var studyMap = {};
 		var studies = [];
@@ -106,7 +107,7 @@ export var Dicom = {
 
 		return Promise.all(promises).then(() => studies);
 	},
-	GetStudiesFromWado : function(url) {
+	getStudiesFromWado : function(url) {
 		var fetchInit = {headers: new Headers({"Accept" : "application/json"})};
 		return fetch(url, fetchInit).then(function(response) {
 			if(response.ok)
@@ -128,6 +129,33 @@ export var Dicom = {
 				study.push(dataSet);
 			}
 			return studies;
+		}).catch(function(error) {
+			console.log(error);
+		});
+	},
+	getSeriesFromWado : function(wadoRoot, studyuid, seriesuid) {
+		var fetchInit = {headers: new Headers({"Accept" : "application/json"})};
+		var url = `${wadoRoot}/studies/${studyuid}/series/${seriesuid}/metadata`;
+		return fetch(url, fetchInit).then(function(response) {
+			if(response.ok)
+				return response.json();
+			throw new Error('Network response was not ok.');
+		}).then(function(obj) {
+			var studyMap = {};
+			var studies = [];
+			for(var i = 0; i < obj.length; i++)
+			{
+				var dataSet = new WadoWrapper(obj[i]);
+				var studyuid = dataSet.string('x0020000d');
+				var study = studyMap[studyuid];
+				if(study === undefined) {
+					study = new Study(dataSet)
+					studyMap[studyuid] = study;
+					studies.push(study);
+				}
+				study.push(dataSet);
+			}
+			return studies[0].series[0];
 		}).catch(function(error) {
 			console.log(error);
 		});
