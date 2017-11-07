@@ -94,6 +94,8 @@ var nFormat = new Intl.NumberFormat(lang, {
 	maximumFractionDigits: 2
 });
 
+var volume;
+
 var workarea = new migl.ViewArea(document.getElementById('workarea'));
 
 var view1 = new migl.SliceView();
@@ -120,8 +122,17 @@ view1.Add2dSceneElement(text);
 var textll = new migl.Text({x: 5, y: 5, textBaseline: 'bottom'});
 textll.text = function() {
 	var voi = cview.voi;
-	//Pos: ${nFormat.format(tools.cross._point[0])}; ${nFormat.format(tools.cross._point[1])}; ${nFormat.format(tools.cross._point[2])}
-	return `WW\\WC: ${(voi.white - voi.black) | 0}\\${((voi.white + voi.black)/2) | 0}`;
+	var str = '';
+	if(cview.activetool === tools.cross) {
+		str += `Pos: ${nFormat.format(tools.cross._point[0])}; ${nFormat.format(tools.cross._point[1])}; ${nFormat.format(tools.cross._point[2])};\n`;
+		let pt = volume.worldToVolume(tools.cross._point);
+		str += `Vol: ${nFormat.format(pt[0])}; ${nFormat.format(pt[1])}; ${nFormat.format(pt[2])};\n`;
+		let val = volume.sampleWorld(tools.cross._point);
+		if(val !== undefined)
+			str += `Val: ${nFormat.format(val)}\n`;
+	}
+	str += `WW\\WC: ${(voi.white - voi.black) | 0}\\${((voi.white + voi.black)/2) | 0}`;
+	return str;
 };
 view1.Add2dSceneElement(textll);
 
@@ -257,6 +268,7 @@ function processFiles(files) {
 
 function setVolumes(vols) {
 	if(vols.length > 0) {
+		volume = vols[0];
 		var vol = vols[0];
 		cview.SetVolume(vol);
 		cview.setDefaultWindow(vol);
