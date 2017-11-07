@@ -34,7 +34,7 @@ class WadoWrapper {
 			throw new Error('Error during BulkData fetch.');
 		}).then(function(body) {
 			var mpdata = parse(body, ctype);
-			return mpdata[0];
+			return new Uint8Array(mpdata[0].buffer.slice(mpdata[0].byteOffset));
 		});
 	}
 	uint16(tag, index) { return this._getInt(tag, index); }
