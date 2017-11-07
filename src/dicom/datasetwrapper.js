@@ -93,4 +93,70 @@ class WadoWrapper {
 	}
 }
 
-export {DatasetWrapper, WadoWrapper};
+
+class OrthancWrapper {
+	constructor(id, dataSet) {
+		this._dataSet = dataSet;
+		this.pixelData = fetch(`/instances/${id}/content/7fe0-0010/0`).then(function(response) {
+			if(response.ok) {
+				return response.arrayBuffer().then((buf) => new Uint8Array(buf));
+			}
+			throw new Error('Error during PixelData fetch.');
+		});
+	}
+	uint16(tag, index) { return this._getInt(tag, index); }
+	int16(tag, index) { return this._getInt(tag, index); }
+	uint32(tag, index) { return this._getInt(tag, index); }
+	int32(tag, index) { return this._getInt(tag, index); }
+	float(tag, index) { return this._getFloat(tag, index); }
+	double(tag, index) { return this._getFloat(tag, index); }
+	string(tag, index) {
+		tag = `${tag.slice(1, 5)},${tag.slice(-4)}`;
+		var element = this._dataSet[tag];
+		if (element && element.Value) {
+			var str = element.Value;
+			if (index >= 0) {
+				var values = str.split('\\');
+				return values[index].trim();
+			}
+			return str.trim();
+		}
+		return undefined;
+	}
+	text (tag, index) {
+		tag = `${tag.slice(1, 5)},${tag.slice(-4)}`;
+		var element = this._dataSet[tag];
+		if (element && element.Value) {
+			var fixedString = element.Value;
+			if (index >= 0) {
+				var values = fixedString.split('\\');
+				return values[index].replace(/ +$/, '');
+			}
+			return fixedString.replace(/ +$/, '');
+		}
+		return undefined;
+	}
+	floatString(tag, index) { return parseFloat(this.string(tag, index)); }
+	intString(tag, index) { return parseInt(this.string(tag, index)); }
+
+	_getInt(tag, index) {
+		tag = `${tag.slice(1, 5)},${tag.slice(-4)}`;
+		var element = this._dataSet[tag];
+		if (element && element.Value) {
+			index = index || 0;
+			return parseInt(element.Value);
+		}
+		return undefined;
+	}
+	_getFloat(tag, index) {
+		tag = `${tag.slice(1, 5)},${tag.slice(-4)}`;
+		var element = this._dataSet[tag];
+		if (element && element.Value) {
+			index = index || 0;
+			return parseFloat(element.Value);
+		}
+		return undefined;
+	}
+}
+
+export {DatasetWrapper, WadoWrapper, OrthancWrapper};

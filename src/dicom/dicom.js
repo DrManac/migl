@@ -1,6 +1,6 @@
 import {__moduleExports as dicomParser} from 'dicom-parser';
 import {vec3} from 'gl-matrix';
-import {DatasetWrapper, WadoWrapper} from './datasetwrapper.js';
+import {DatasetWrapper, WadoWrapper, OrthancWrapper} from './datasetwrapper.js';
 import {Image as DicomImage} from './image.js';
 import {Series} from './series.js';
 import {Study} from './study.js';
@@ -159,5 +159,38 @@ export var Dicom = {
 		}).catch(function(error) {
 			console.log(error);
 		});
+	},
+	getSeriesFromOrthanc : function(seriesuid) {
+		var fetchInit = {headers: new Headers({"Accept" : "application/json"})};
+		var url = `/series/${seriesuid}`;
+		return fetch(url, fetchInit).then(function(response) {
+			if(response.ok)
+				return response.json();
+			throw new Error('Network response was not ok.');
+		}).then(function(obj) {
+			return Promise.all(obj.Instances.map(uid => fetch(`/instances/${uid}/tags`, fetchInit).then(function(response) {
+				if(response.ok)
+					return response.json().then((json) => ({id: uid, json: json}));
+				throw new Error('Network response was not ok.');
+			})));
+		}).then(function(obj) {
+			var studyMap = {};
+			var studies = [];
+			for(var i = 0; i < obj.length; i++)
+			{
+				var dataSet = new OrthancWrapper(obj[i].id, obj[i].json);
+				var studyuid = dataSet.string('x0020000d');
+				var study = studyMap[studyuid];
+				if(study === undefined) {
+					study = new Study(dataSet)
+					studyMap[studyuid] = study;
+					studies.push(study);
+				}
+				study.push(dataSet);
+			}
+			return studies[0].series[0];
+		})/*.catch(function(error) {
+			console.log(error);
+		})*/;
 	}
 };
