@@ -112,7 +112,7 @@ export var Dicom = {
 		return fetch(url, fetchInit).then(function(response) {
 			if(response.ok)
 				return response.json();
-			throw new Error('Network response was not ok.');
+			throw new Error("Couldn't fetch study metadata");
 		}).then(function(obj) {
 			var studyMap = {};
 			var studies = [];
@@ -139,7 +139,7 @@ export var Dicom = {
 		return fetch(url, fetchInit).then(function(response) {
 			if(response.ok)
 				return response.json();
-			throw new Error('Network response was not ok.');
+			throw new Error("Couldn't fetch series metadata");
 		}).then(function(obj) {
 			var studyMap = {};
 			var studies = [];
@@ -158,6 +158,7 @@ export var Dicom = {
 			return studies[0].series[0];
 		}).catch(function(error) {
 			console.log(error);
+			throw error;
 		});
 	},
 	getSeriesFromOrthanc : function(seriesuid) {
@@ -166,12 +167,12 @@ export var Dicom = {
 		return fetch(url, fetchInit).then(function(response) {
 			if(response.ok)
 				return response.json();
-			throw new Error('Network response was not ok.');
+			throw new Error("Couldn't fetch series metadata");
 		}).then(function(obj) {
 			return Promise.all(obj.Instances.map(uid => fetch(`/instances/${uid}/tags`, fetchInit).then(function(response) {
 				if(response.ok)
 					return response.json().then((json) => ({id: uid, json: json}));
-				throw new Error('Network response was not ok.');
+				throw new Error("Couldn't fetch instance metadata");
 			})));
 		}).then(function(obj) {
 			var studyMap = {};
@@ -189,8 +190,9 @@ export var Dicom = {
 				study.push(dataSet);
 			}
 			return studies[0].series[0];
-		})/*.catch(function(error) {
+		}).catch(function(error) {
 			console.log(error);
-		})*/;
+			throw error;
+		});
 	}
 };
