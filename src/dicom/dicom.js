@@ -107,8 +107,9 @@ export var Dicom = {
 
 		return Promise.all(promises).then(() => studies);
 	},
-	getStudiesFromWado : function(url) {
+	getStudyFromWado : function(wadoRoot, studyuid) {
 		var fetchInit = {headers: new Headers({"Accept" : "application/json"})};
+		var url = `${wadoRoot}/studies/${studyuid}/metadata`;
 		return fetch(url, fetchInit).then(function(response) {
 			if(response.ok)
 				return response.json();
@@ -128,9 +129,10 @@ export var Dicom = {
 				}
 				study.push(dataSet);
 			}
-			return studies;
+			return studies[0];
 		}).catch(function(error) {
 			console.log(error);
+			throw error;
 		});
 	},
 	getSeriesFromWado : function(wadoRoot, studyuid, seriesuid) {

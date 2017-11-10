@@ -18,30 +18,30 @@ class FusionView extends SliceView {
 	SetVolume2(vol) {
 		this._el3d2.volume = vol;
 		this._updateTranslation(this._el3d._volume, vol);
-		this._hasChanges3d = true;
+		this.Invalidate3d();
 	}
 	SetLut2(lut) {
 		lut.image.then((img) => {
 			this._el3d2._lut = img;
-			this._hasChanges3d = true;
+			this.Invalidate3d();
 		});
 	}
 	get invert2() { return this._el3d2._black > this._el3d2._white; }
 	set invert2(invert) {
-		if(invert == this.invert) return;
+		if(invert == this.invert2) return;
 		var tmp = this._el3d2._black;
 		this._el3d2._black = this._el3d2._white;
 		this._el3d2._white = tmp;
-		this._hasChanges3d = true;
+		this.Invalidate();
 	}
-	get voi2() { return this.invert ?
-		{ black: this._el3d2._black, white: this._el3d2._white } :
-		{ black: this._el3d2._white, white: this._el3d2._black };
+	get voi2() { return this.invert2 ?
+		{ black: this._el3d2._white, white: this._el3d2._black }:
+		{ black: this._el3d2._black, white: this._el3d2._white };
 	}
 	set voi2(voi) {
 		if(voi.black > voi.white - 1)
 			voi.black = voi.white - 1;
-		if(this.invert)
+		if(this.invert2)
 		{
 			this._el3d2._black = voi.white;
 			this._el3d2._white = voi.black;
@@ -49,7 +49,7 @@ class FusionView extends SliceView {
 			this._el3d2._black = voi.black;
 			this._el3d2._white = voi.white;
 		}
-		this._hasChanges3d = true;
+		this.Invalidate();
 	}
 	setDefaultWindow2(ii) {
 		this.voi2 = {black: ii.windowCenter - ii.windowWidth / 2, white: ii.windowCenter + ii.windowWidth / 2};
