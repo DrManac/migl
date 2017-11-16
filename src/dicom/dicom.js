@@ -196,5 +196,40 @@ export var Dicom = {
 			console.log(error);
 			throw error;
 		});
+	},
+	getStudyFromOrthanc : function(studyuid) {
+		var fetchInit = {headers: new Headers({"Accept" : "application/json"})};
+		var url = `/studies/${studyuid}/instances`;
+		return fetch(url, fetchInit).then(function(response) {
+			if(response.ok)
+				return response.json();
+			throw new Error("Couldn't fetch study metadata");
+		}).then(function(obj) {
+			return Promise.all(Object.keys(obj).map(i => obj[i].ID).map(uid => fetch(`/instances/${uid}/tags`, fetchInit).then(function(response) {
+				if(response.ok)
+					return response.json().then((json) => ({id: uid, json: json}));
+				throw new Error("Couldn't fetch instance metadata");
+			})));
+		}).then(function(obj) {
+			var studyMap = {};
+			var studies = [];
+			for(var i = 0; i < obj.length; i++)
+			{
+				var dataSet = new OrthancWrapper(obj[i].id, obj[i].json);
+				var studyuid = dataSet.string('x0020000d');
+				var study = studyMap[studyuid];
+				if(study === undefined) {
+					study = new Study(dataSet)
+					studyMap[studyuid] = study;
+					studies.push(study);
+				}
+				study.push(dataSet);
+			}
+			return studies[0];
+		}).catch(function(error) {
+			console.log(error);
+			throw error;
+		});
 	}
+
 };

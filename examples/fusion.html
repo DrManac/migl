@@ -184,10 +184,13 @@ for(let lut of [].concat([migl.Luts.defaultOverlay], migl.Luts.list.slice(0, 16)
 
 var query = migl.Query;
 
-var studyPromise = migl.Dicom.getStudyFromWado('/dicom-web', '1.3.6.1.4.1.5962.99.1.1152916310.1104091511.1495801568086.4.0');
+var studyPromise = query.type == 'dicom-web' ?
+	migl.Dicom.getStudyFromWado('/dicom-web', query.study || '1.3.6.1.4.1.5962.99.1.1152916310.1104091511.1495801568086.4.0') :
+	migl.Dicom.getStudyFromOrthanc(query.study || 'cb9556b1-4ba4d0a3-639a8e7d-7b30c70c-b4888f54');
 studyPromise.then(s => migl.Dicom.volumesFromStudies([s])).then(setVolumes).then(() => document.getElementById("overlay").style.display = "none").catch(function(e) {
 	document.getElementById("overlay-text").innerHTML = `Error: ${e.message}`;
 });
+
 
 studyPromise.then(function(study) {
 	text.text = `${study.patientName}
