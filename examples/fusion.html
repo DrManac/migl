@@ -187,24 +187,32 @@ var query = migl.Query;
 var studyPromise = query.type == 'dicom-web' ?
 	migl.Dicom.getStudyFromWado('/dicom-web', query.study || '1.3.6.1.4.1.5962.99.1.1152916310.1104091511.1495801568086.4.0') :
 	migl.Dicom.getStudyFromOrthanc(query.study || 'cb9556b1-4ba4d0a3-639a8e7d-7b30c70c-b4888f54');
-studyPromise.then(s => migl.Dicom.volumesFromStudies([s])).then(setVolumes).then(() => document.getElementById("overlay").style.display = "none").catch(function(e) {
+
+
+var seriesPromise = studyPromise.then(selectSeries);
+seriesPromise.then(volSeries => [].concat(...volSeries.map(migl.Dicom.volumesFromSeries))).then(setVolumes).then(() => document.getElementById("overlay").style.display = "none").catch(function(e) {
 	document.getElementById("overlay-text").innerHTML = `Error: ${e.message}`;
 });
 
 
-studyPromise.then(function(study) {
-	text.text = `${study.patientName}
-${study.patientId}
-${dFormat.format(study.dateTime)}
-${study.description}
-${study.series[0].description}/${study.series[1].description}`;
+seriesPromise.then(function(serArray) {
+	text.text = `${serArray[0].study.patientName}
+${serArray[0].study.patientId}
+${dFormat.format(serArray[0].study.dateTime)}
+${serArray[0].study.description}
+${serArray[0].description}/${serArray[1].description}`;
 });
 
 render();
-function render()
-{
+function render() {
 	cview.Render();
 	requestAnimationFrame(render);
+}
+
+function selectSeries(study) {
+	var vs = study.series.filter(se => se.isVolumetric);
+	if(vs.length < 2) throw new Error("At least two volumetric series expected");
+	return [vs[0], vs[1]];
 }
 
 function setVolumes(vols) {
