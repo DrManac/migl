@@ -1,5 +1,6 @@
 import {__moduleExports as dicomParser} from 'dicom-parser';
 import {Series} from './series.js';
+import {parseDateTime} from './utils.js';
 
 class Study {
 	constructor(dataSet) {
@@ -7,9 +8,7 @@ class Study {
 		this.series = [];
 
 		this.uid = dataSet.string('x0020000d');
-	   	this.date = dicomParser.parseDA(dataSet.string('x00080020'));
-	   	this.time = dicomParser.parseTM(dataSet.string('x00080030'));
-		this.dateTime = new Date(this.date.year, this.date.month, this.date.day, this.time.hours, this.time.minutes);
+		this.dateTime = parseDateTime(dataSet, 'x00080020', 'x00080030');
 	   	this.description = dataSet.string('x00081030');
 	   	this.patientId = dataSet.string('x00100020');
 	   	this.patientName = dataSet.string('x00100010');
