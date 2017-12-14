@@ -1,0 +1,123 @@
+<html>
+<head>
+	<title>migl explorer</title>
+	<meta charset="utf-8"></meta>
+
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+</head>
+<body>
+    <div id="jsGrid"></div>
+
+    <script>
+        var gridController = {
+            loadData: function(filter) {
+                return $.ajax({
+                    type: "GET",
+                    headers: {
+                        "Accept": "application/json"
+                    },
+                    url: "/dicom-web/studies?includefield=00081030",
+                    data: filter
+                });
+            },
+            insertItem: $.noop,
+            updateItem: $.noop,
+            deleteItem: $.noop
+        };
+
+
+
+    var DicomField = function(config) {
+        jsGrid.Field.call(this, config);
+    };
+
+    DicomField.prototype = new jsGrid.Field({
+
+        tag: "00100020",
+
+        itemTemplate: function(value, row) {
+            if(!row[this.tag]) return undefined;
+            switch(row[this.tag].vr){
+                case 'TM':
+                    var time = row[this.tag].Value[0];
+                    var hh = parseInt(time.substring(0, 2), 10);
+                    var mm = time.length >= 4 ? parseInt(time.substring(2, 4), 10) : undefined;
+                    if(hh < 10) hh = "0" + hh;
+                    if(mm < 10) mm = "0" + mm;
+                    return `${hh}:${mm}`;
+                    break;
+                case 'DA':
+                    var date = row[this.tag].Value[0];
+                    var yyyy = parseInt(date.substring(0, 4), 10);
+                    var mm = parseInt(date.substring(4, 6), 10);
+                    var dd = parseInt(date.substring(6, 8), 10);
+                    return new Date(yyyy, mm, dd).toDateString();
+
+                    break;
+            }
+            return row[this.tag].Value[0];
+        },
+    });
+
+    jsGrid.fields.dicom = DicomField;
+
+    var ViewField = function(config) {
+        jsGrid.Field.call(this, config);
+    };
+
+
+    ViewField.prototype = new jsGrid.Field({
+        itemTemplate: function(value, row) {
+            if(!row["00080061"]) return undefined;
+
+            if(row["00080061"].Value[0].indexOf('\\') !== -1)
+            {
+                return `<a>Fusion</a>`;
+            }
+            else
+            {
+                return `<a>MPR</a>`;
+            }
+
+        },
+    });
+
+    jsGrid.fields.view = ViewField;
+
+
+
+        $("#jsGrid").jsGrid({
+            width: "100%",
+            height: "100%",
+
+            autoload: true,
+            inserting: false,
+            editing: false,
+            sorting: true,
+            paging: true,
+
+            controller: gridController,
+            data: [],
+
+            fields: [
+                { name: "Patient ID", tag: "00100020", type: "dicom" },
+                { name: "Name", type: "dicom", tag:"00100010" },
+                { name: "Accesion Number", type: "dicom", tag: "00080050" },
+                { name: "Modality", type: "dicom", tag: "00080061", width:50 },
+                { name: "Description", type: "dicom", tag: "00081030" },
+                { name: "Date", type: "dicom", tag: "00080020"},
+                { name: "Time", type: "dicom", tag: "00080030", width:50 },
+                { name: "View", type: "view", width:50 },
+            ]
+        });
+    </script>
+
+
+</body>
+</html>
