@@ -74,15 +74,15 @@
 
     ViewField.prototype = new jsGrid.Field({
         itemTemplate: function(value, row) {
-            if(!row["00080061"]) return undefined;
+            if(!row["00080061"] || !row["0020000D"]) return undefined;
 
             if(row["00080061"].Value[0].indexOf('\\') !== -1)
             {
-                return `<a>Fusion</a>`;
+                return `<a target="_blank" href="fusion.html?type=dicom-web&study=${row["0020000D"].Value[0]}">Fusion</a>`;
             }
             else
             {
-                return `<a>MPR</a>`;
+                return `<a target="_blank" href="mpr.html?type=dicom-web&study=${row["0020000D"].Value[0]}">MPR</a>`;
             }
 
         },
